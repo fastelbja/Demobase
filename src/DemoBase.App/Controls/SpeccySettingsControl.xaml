@@ -1,9 +1,0 @@
-<!-- Fichier orphelin — l'émulateur "Speccy" (Marat Fayzullin) a été retiré de DemoBase.
-     Plus aucune référence (EmulatorSettingsView.xaml, ViewModels, EmulatorService) ne
-     pointe vers ce contrôle. Ne peut pas être supprimé du disque depuis cette session
-     (restriction du dossier de sortie) — vidé pour ne plus référencer le ViewModel
-     supprimé. À supprimer manuellement si besoin. -->
-<UserControl x:Class="DemoBase.App.Views.Emulators.SpeccySettingsControl"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-</UserControl>

@@ -1,6 +1,0 @@
-<UserControl x:Class="DemoBase.App.Views.Emulators.FSUaeSettingsControl"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- FS-UAE non implémenté — contrôle placeholder pour éviter les erreurs de build -->
-    <Border/>
-</UserControl>
