@@ -1,0 +1,648 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- ── Sidebar navigation ─────────────────────────────────────────────── -->
+    <sys:String x:Key="Nav_Releases">Releases</sys:String>
+    <sys:String x:Key="Nav_Favorites">Favorites</sys:String>
+    <sys:String x:Key="Nav_Soundtracks">♪ Soundtracks</sys:String>
+    <sys:String x:Key="Nav_FavGraphics">🖼 Graphics</sys:String>
+    <sys:String x:Key="Nav_Groups">Groups</sys:String>
+    <sys:String x:Key="Nav_Artists">Artists</sys:String>
+    <sys:String x:Key="Nav_Platforms">Platforms</sys:String>
+    <sys:String x:Key="Nav_Parties">Parties</sys:String>
+    <sys:String x:Key="Nav_ScanROMs">Scan for Releases</sys:String>
+    <sys:String x:Key="Nav_OnThisDay">On This Day / Random</sys:String>
+    <sys:String x:Key="OnThisDay_Found">🎉 On this day, in {1}: {0}</sys:String>
+    <sys:String x:Key="OnThisDay_Random">🎲 Nothing for today — random pick: {0} ({1})</sys:String>
+    <sys:String x:Key="OnThisDay_Empty">Catalog is empty — nothing to pick.</sys:String>
+    <sys:String x:Key="Nav_Emulators">Emulators</sys:String>
+    <sys:String x:Key="Nav_Preferences">Preferences</sys:String>
+    <sys:String x:Key="Nav_DemoEffects">◼  Demo effects</sys:String>
+    <sys:String x:Key="Nav_DemoEffectsOn">▶  Demo effects  [click = next]</sys:String>
+    <sys:String x:Key="Nav_Theme">☀ / ☾  Theme</sys:String>
+    <sys:String x:Key="Nav_FavoritesSection">FAVORITES</sys:String>
+    <sys:String x:Key="Pref_SlideshowDuration">Slideshow duration (seconds)</sys:String>
+    <sys:String x:Key="Pref_SlideshowDurationDesc">Display duration for each image in Graphics slideshow mode (MediaBrowser).</sys:String>
+    <sys:String x:Key="MB_GraphicsCollection">GRAPHIC COLLECTION</sys:String>
+    <sys:String x:Key="MB_MusicCollection">MUSIC COLLECTION</sys:String>
+    <sys:String x:Key="MB_Shuffle">⇌  Shuffle</sys:String>
+    <sys:String x:Key="MB_ClickToListen">Click a release to play it</sys:String>
+    <sys:String x:Key="MB_SortBy">Sort:</sys:String>
+    <sys:String x:Key="MB_SearchByAuthor">Author</sys:String>
+    <sys:String x:Key="MB_SearchByTitle">Title</sys:String>
+    <sys:String x:Key="MB_MusicReleases"> music releases</sys:String>
+    <sys:String x:Key="MB_GraphicsCount"> graphics</sys:String>
+    <sys:String x:Key="Nav_Media">Media Browser</sys:String>
+    <sys:String x:Key="Nav_MediaSection">MEDIA</sys:String>
+    <sys:String x:Key="Nav_MediaGraphics">🖼 Graphics</sys:String>
+    <sys:String x:Key="Nav_MediaMusic">♪ Music</sys:String>
+    <sys:String x:Key="Nav_Library">LIBRARY</sys:String>
+    <sys:String x:Key="Nav_Management">MANAGEMENT</sys:String>
+
+    <!-- ── App générale ───────────────────────────────────────────────────── -->
+    <sys:String x:Key="App_Title">DemoBase</sys:String>
+    <sys:String x:Key="App_Subtitle">Scene Archive Manager</sys:String>
+    <sys:String x:Key="App_Ready">Ready</sys:String>
+    <sys:String x:Key="App_Loading">⏳ Loading…</sys:String>
+    <sys:String x:Key="App_Save">💾 Save</sys:String>
+    <sys:String x:Key="App_Reset">↩ Reset</sys:String>
+    <sys:String x:Key="App_Cancel">Cancel</sys:String>
+    <sys:String x:Key="App_Delete">Delete</sys:String>
+    <sys:String x:Key="App_Edit">✎ Edit</sys:String>
+    <sys:String x:Key="App_Open">Open ↗</sys:String>
+    <sys:String x:Key="App_Download">📥 Download</sys:String>
+    <sys:String x:Key="App_OpenFolder">📂 Open folder</sys:String>
+
+    <!-- ── Release list ───────────────────────────────────────────────────── -->
+    <sys:String x:Key="RL_All">All</sys:String>
+    <sys:String x:Key="RL_Demos">Demos</sys:String>
+    <sys:String x:Key="RL_Graphics">Graphics</sys:String>
+    <sys:String x:Key="RL_Music">Music</sys:String>
+    <sys:String x:Key="RL_SortAZ">A → Z</sys:String>
+    <sys:String x:Key="RL_SortDate">📅 Date</sys:String>
+    <sys:String x:Key="RL_UnseenOnly">👁 Unseen only</sys:String>
+    <sys:String x:Key="RL_SelectRelease">Select a release</sys:String>
+    <sys:String x:Key="RL_NoResults">No results.</sys:String>
+    <sys:String x:Key="RL_LoadMore">Load more…</sys:String>
+
+    <!-- ── Release detail ─────────────────────────────────────────────────── -->
+    <sys:String x:Key="RD_Infos">Info</sys:String>
+    <sys:String x:Key="RD_Credits">Credits</sys:String>
+    <sys:String x:Key="RD_Media">Media</sys:String>
+    <sys:String x:Key="RD_Files">Files</sys:String>
+    <sys:String x:Key="RD_CodeSources">Source Code</sys:String>
+    <sys:String x:Key="RD_Screenshots">🖼 Screenshots</sys:String>
+    <sys:String x:Key="RD_Soundtracks">🎵 Soundtracks</sys:String>
+    <sys:String x:Key="RD_VideoCapture">🎬 Video Capture</sys:String>
+    <sys:String x:Key="RD_Launch">▶ Launch</sys:String>
+    <!-- 2026-07-25 : external release not yet covered by a DAT AND not cached locally
+         yet — clicking will first trigger an ad-hoc download. -->
+    <sys:String x:Key="RD_DownloadAndLaunch">⬇ Download &amp; launch</sys:String>
+    <sys:String x:Key="RD_Play">▶ Play</sys:String>
+    <sys:String x:Key="RD_PlayVideo">▶ Play Video</sys:String>
+    <sys:String x:Key="RD_Watch">▶ Watch</sys:String>
+    <sys:String x:Key="RD_LaunchCompanion">💾 Launch</sys:String>
+    <sys:String x:Key="RD_LaunchCompanionTooltip">A disk or executable was found in the archive — launch via emulator</sys:String>
+    <sys:String x:Key="RD_PlayVideoCompanionTooltip">A video (often a capture of the demo) was found in the archive — useful if emulation doesn't work</sys:String>
+    <sys:String x:Key="RD_PlayAll">▶▶ Play All</sys:String>
+    <sys:String x:Key="RD_Favorite">★ Favorite</sys:String>
+    <sys:String x:Key="RD_NoDAT">No DAT file found for this release.</sys:String>
+    <sys:String x:Key="RD_NoCodeSources">No source code file found for this release.</sys:String>
+    <sys:String x:Key="RD_NoVideo">No video available for this release.</sys:String>
+    <sys:String x:Key="RD_NoSoundtrack">No linked soundtrack.</sys:String>
+    <sys:String x:Key="RD_NoLinks">No links registered</sys:String>
+    <sys:String x:Key="RD_NoFavSoundtrack">No favorite soundtracks.</sys:String>
+    <sys:String x:Key="RD_NoFavGraphic">No favorite graphics.</sys:String>
+    <sys:String x:Key="RD_ClickPlay">Click ▶ Play to listen to this release.</sys:String>
+    <sys:String x:Key="PL_Playlists">PLAYLISTS</sys:String>
+    <sys:String x:Key="PL_New">+ New playlist</sys:String>
+    <sys:String x:Key="PL_PlayAll">▶▶ Play all playlists</sys:String>
+    <sys:String x:Key="PL_NoPlaylist">No playlists yet. Create one to group your favorite tracks (e.g. an album).</sys:String>
+    <sys:String x:Key="PL_AddToPlaylist">➕ Add to a playlist</sys:String>
+    <sys:String x:Key="PL_AddToPlaylistEmpty">(no playlist — create one first)</sys:String>
+    <sys:String x:Key="PL_Rename">✎ Rename</sys:String>
+    <sys:String x:Key="PL_Delete">🗑 Delete</sys:String>
+    <sys:String x:Key="PL_DeleteConfirm">Delete playlist "{0}"?</sys:String>
+    <sys:String x:Key="PL_DialogTitleNew">New playlist</sys:String>
+    <sys:String x:Key="PL_DialogTitleRename">Rename playlist</sys:String>
+    <sys:String x:Key="PL_DialogLabel">Playlist name:</sys:String>
+    <sys:String x:Key="PL_DialogOk">✓ OK</sys:String>
+    <sys:String x:Key="PL_DialogCancel">Cancel</sys:String>
+    <sys:String x:Key="PL_MyFavorites">MY FAVORITES (unsorted)</sys:String>
+    <sys:String x:Key="PL_NewInMenu">➕ New playlist…</sys:String>
+    <sys:String x:Key="PL_SelectHint">Click a playlist to select it — a favorite's "➕" will then add straight to it.</sys:String>
+    <sys:String x:Key="RD_ClickVideo">Click a video to start playback.</sys:String>
+    <sys:String x:Key="RD_ExternalLinks">EXTERNAL LINKS</sys:String>
+    <sys:String x:Key="RD_PersonalNote">PERSONAL NOTE</sys:String>
+    <sys:String x:Key="RD_Tags">Tags</sys:String>
+    <sys:String x:Key="RD_TagsHint">Comma-separated — e.g. lost, invitation, best-of</sys:String>
+    <sys:String x:Key="RD_Videos">VIDEOS</sys:String>
+    <sys:String x:Key="RD_LocalCaptures">LOCAL CAPTURES</sys:String>
+    <sys:String x:Key="RD_SaveEdit">✓ Save</sys:String>
+
+    <!-- ── Release edit ───────────────────────────────────────────────────── -->
+    <sys:String x:Key="RE_Rating">Rating</sys:String>
+    <sys:String x:Key="RE_Notes">Notes</sys:String>
+
+    <!-- ── Preferences ────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Pref_Title">Preferences</sys:String>
+    <sys:String x:Key="Pref_Paths">PATHS</sys:String>
+    <sys:String x:Key="Pref_Interface">INTERFACE</sys:String>
+    <sys:String x:Key="Pref_EmuConfigs">Emulator configurations</sys:String>
+    <sys:String x:Key="Pref_EmuConfigsDesc">Folder containing configuration files (.uae, .cfg…)</sys:String>
+    <sys:String x:Key="Pref_Emulators">Emulators</sys:String>
+    <sys:String x:Key="Pref_EmulatorsDesc">Folder containing emulator executables</sys:String>
+    <sys:String x:Key="Pref_Images">Images</sys:String>
+    <sys:String x:Key="Pref_ImagesDesc">Folder containing screenshots and media</sys:String>
+    <sys:String x:Key="Pref_DATs">DATs</sys:String>
+    <sys:String x:Key="Pref_DATsDesc">Folder containing DAT files (Logiqx XML)</sys:String>
+    <sys:String x:Key="Pref_Releases">Releases</sys:String>
+    <sys:String x:Key="Pref_ReleasesDesc">Folder containing release ZIP files</sys:String>
+    <sys:String x:Key="Pref_Theme">Theme</sys:String>
+    <sys:String x:Key="Pref_ThemeDesc">General appearance of the application</sys:String>
+    <sys:String x:Key="Pref_ThemeLight">☀ Light</sys:String>
+    <sys:String x:Key="Pref_ThemeDark">🌙 Dark</sys:String>
+    <sys:String x:Key="Pref_DemoEffects">Demo effects</sys:String>
+    <sys:String x:Key="Pref_DemoEffectsDesc">Animations and visual effects in the interface</sys:String>
+    <sys:String x:Key="Pref_Language">Language</sys:String>
+    <sys:String x:Key="Pref_LanguageDesc">Interface language (no restart required)</sys:String>
+    <sys:String x:Key="Pref_Saved">✓ Preferences saved.</sys:String>
+    <sys:String x:Key="Pref_Views">VIEWS &amp; AUTO-FAVORITES</sys:String>
+    <sys:String x:Key="Pref_AutoFavoriteThreshold">Auto-favorite threshold</sys:String>
+    <sys:String x:Key="Pref_AutoFavoriteThresholdDesc">Number of views beyond which a release is automatically added to favorites. 0 = disabled.</sys:String>
+    <sys:String x:Key="Pref_ResetViews">Reset views</sys:String>
+    <sys:String x:Key="Pref_ResetViewsDesc">Resets the view count of every release (used by the "Unseen" filter). Irreversible.</sys:String>
+    <sys:String x:Key="Pref_ResetViewsButton">🗑 Reset views</sys:String>
+    <sys:String x:Key="Pref_ViewsReset">✓ View count reset.</sys:String>
+    <sys:String x:Key="Pref_Audio">UADE</sys:String>
+    <sys:String x:Key="Pref_UadeGain">Gain</sys:String>
+    <sys:String x:Key="Pref_UadeGainDesc">Volume of exotic Amiga formats (TFMX, MDAT…), usually quieter than ZXTune/libopenmpt. 1.0 = original sound.</sys:String>
+    <sys:String x:Key="Pref_UadePanning">Stereo panning</sys:String>
+    <sys:String x:Key="Pref_UadePanningDesc">Softens the Amiga chip's (Paula) hard left/right panning, which can sound very harsh on modern speakers/headphones. 0 = original sound, 2 = full mono mix.</sys:String>
+
+    <!-- ── Emulators ──────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Emu_SelectOrCreate">Select or create an emulator</sys:String>
+    <sys:String x:Key="Emu_Profiles">LAUNCH PROFILES</sys:String>
+    <sys:String x:Key="Emu_Platform">PLATFORM</sys:String>
+    <sys:String x:Key="Emu_CmdLine">COMMAND LINE</sys:String>
+    <sys:String x:Key="Emu_WorkDir">WORKING DIRECTORY</sys:String>
+    <sys:String x:Key="Emu_ConfigFile">CONFIG FILE (optional)</sys:String>
+    <sys:String x:Key="Emu_PreScript">PRE-LAUNCH SCRIPT (optional)</sys:String>
+    <sys:String x:Key="Emu_PreScriptDesc">Executed before launch. Variables {file}, {dir} available.</sys:String>
+    <sys:String x:Key="Emu_ProfileName">PROFILE NAME</sys:String>
+    <sys:String x:Key="Emu_Fullscreen">Fullscreen</sys:String>
+    <sys:String x:Key="Emu_DefaultPlatform">Default for this platform</sys:String>
+    <sys:String x:Key="Emu_AddProfile">+ Profile</sys:String>
+    <sys:String x:Key="Emu_Test">Test</sys:String>
+    <sys:String x:Key="Emu_SaveWinUAE">💾  Save WinUAE configuration</sys:String>
+
+    <!-- ── Import / Export ────────────────────────────────────────────────── -->
+    <sys:String x:Key="Import_Title">DemoBase — Initial import</sys:String>
+    <sys:String x:Key="Import_Subtitle">Demozoo database import</sys:String>
+    <sys:String x:Key="Import_Download">Downloading</sys:String>
+    <sys:String x:Key="Import_Parsing">Importing</sys:String>
+    <sys:String x:Key="Import_Finalize">Finalizing</sys:String>
+    <sys:String x:Key="Import_Done">Import complete</sys:String>
+    <sys:String x:Key="Import_Preparing">Preparing…</sys:String>
+    <sys:String x:Key="Import_Copyright">Data © Demozoo contributors (CC BY 4.0) — demozoo.org</sys:String>
+    <sys:String x:Key="Export_Title">Export Demozoo → demozoo_raw.db</sys:String>
+    <sys:String x:Key="Export_Download">Download and import of the full Demozoo database</sys:String>
+
+    <!-- ── Lists ──────────────────────────────────────────────────────────── -->
+    <sys:String x:Key="List_Groups">GROUPS (</sys:String>
+    <sys:String x:Key="List_Screenshots">Screenshots (</sys:String>
+    <sys:String x:Key="List_Add">+ Add</sys:String>
+    <sys:String x:Key="List_Remove">🗑 Remove</sys:String>
+    <sys:String x:Key="List_Stop">⏹  Stop</sys:String>
+    <sys:String x:Key="List_Start">▶  Start</sys:String>
+
+    <!-- ── Screenshots download ───────────────────────────────────────────── -->
+    <sys:String x:Key="SS_Title">📥  Screenshot download</sys:String>
+
+    <sys:String x:Key="RD_Loading">⏳ Loading…</sys:String>
+    <sys:String x:Key="RD_LoadMore">More…</sys:String>
+    <sys:String x:Key="RD_Competitions">COMPETITIONS</sys:String>
+    <sys:String x:Key="RD_CreditsSection">CREDITS</sys:String>
+    <sys:String x:Key="RD_Information">INFORMATION</sys:String>
+    <sys:String x:Key="RD_Links">LINKS</sys:String>
+    <sys:String x:Key="RD_Notes">NOTES</sys:String>
+    <sys:String x:Key="RD_UsedIn">Used In</sys:String>
+    <sys:String x:Key="RD_SortPrefix">Sort: </sys:String>
+    <sys:String x:Key="RD_Type">Type</sys:String>
+    <sys:String x:Key="App_ExportRaw">🗄 Export Demozoo Raw DB</sys:String>
+    <sys:String x:Key="Nav_DemozooUpdate">Demozoo Update</sys:String>
+    <sys:String x:Key="RD_Use">◯ Use</sys:String>
+    <sys:String x:Key="RD_Selected">▶ Selected</sys:String>
+    <sys:String x:Key="RD_OpenFile">📂 Open</sys:String>
+
+    <!-- ── List counters ────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Count_Groups">groups</sys:String>
+    <sys:String x:Key="Count_Artists">artists</sys:String>
+    <sys:String x:Key="Count_Releases">releases</sys:String>
+    <sys:String x:Key="Count_Parties">parties</sys:String>
+    <sys:String x:Key="Count_Platforms">platforms</sys:String>
+    <sys:String x:Key="Count_Soundtracks">soundtracks</sys:String>
+    <sys:String x:Key="Count_Graphics">graphics</sys:String>
+    <sys:String x:Key="Count_Profiles">profile(s)</sys:String>
+    <sys:String x:Key="Count_Entries">entries</sys:String>
+    <sys:String x:Key="Count_Competitions">competitions</sys:String>
+
+
+    <!-- ── Dynamic messages (ViewModels) ────────────────────────────────────── -->
+    <sys:String x:Key="Msg_Added">added to favorites</sys:String>
+    <sys:String x:Key="Msg_Removed">removed from favorites</sys:String>
+    <sys:String x:Key="Msg_NoAudioDat">No audio file found in DATs.</sys:String>
+    <sys:String x:Key="Msg_NoFileLoaded">No file loaded</sys:String>
+    <sys:String x:Key="Msg_Found">✓ Found</sys:String>
+    <sys:String x:Key="Msg_NotFound">✗ Not found</sys:String>
+    <sys:String x:Key="Msg_NoExecutableNeeded">ℹ No separate executable needed</sys:String>
+    <sys:String x:Key="Msg_ConfigSaved">✓ Configuration saved</sys:String>
+    <sys:String x:Key="Msg_FormatNotPlayable">Format not playable</sys:String>
+
+    <!-- ── Emulators (additional) ────────────────────────────────────────────── -->
+    <sys:String x:Key="Emu_EmulatorLabel">EMULATOR</sys:String>
+    <sys:String x:Key="Emu_Default">Default</sys:String>
+    <sys:String x:Key="Emu_Name">NAME</sys:String>
+    <sys:String x:Key="Emu_Version">VERSION</sys:String>
+    <sys:String x:Key="Emu_Website">WEBSITE</sys:String>
+    <sys:String x:Key="Emu_Executable">EXECUTABLE</sys:String>
+    <sys:String x:Key="Emu_Type">Emulator type</sys:String>
+    <sys:String x:Key="Emu_WinUAEConfig">⚙ WinUAE Configuration</sys:String>
+    <sys:String x:Key="Emu_AmigaModel">Amiga model</sys:String>
+    <sys:String x:Key="Emu_CPU">Processor</sys:String>
+    <sys:String x:Key="Emu_ChipRAM">Chip RAM</sys:String>
+    <sys:String x:Key="Emu_FastRAM">Fast RAM</sys:String>
+    <sys:String x:Key="Emu_Kickstart">Kickstart ROM</sys:String>
+    <sys:String x:Key="Emu_Display">Display</sys:String>
+    <sys:String x:Key="Emu_Bilinear">Bilinear filter</sys:String>
+    <sys:String x:Key="Emu_DoubleScan">Double scan lines</sys:String>
+    <sys:String x:Key="Emu_AspectRatio">Aspect ratio correction</sys:String>
+    <sys:String x:Key="Emu_FloppySpeed">Floppy speed</sys:String>
+    <sys:String x:Key="Emu_FloppyReal">100% (real)</sys:String>
+    <sys:String x:Key="Emu_FloppyTurbo">800% (turbo)</sys:String>
+    <sys:String x:Key="Emu_AltirraConfig">⚙ Altirra Configuration</sys:String>
+    <sys:String x:Key="Emu_Hardware">Hardware model</sys:String>
+    <sys:String x:Key="Emu_VideoStandard">Video standard</sys:String>
+    <sys:String x:Key="Emu_BasicRom">Enable internal BASIC</sys:String>
+    <sys:String x:Key="Emu_Artifacting">Video artifacting</sys:String>
+    <sys:String x:Key="Emu_SaveAltirra">💾  Save Altirra configuration</sys:String>
+    <sys:String x:Key="Emu_AltirraFullscreen">Start in full screen (/f)</sys:String>
+    <sys:String x:Key="Emu_AltirraNoBorderless">Disable borderless mode (/noborderless)</sys:String>
+
+    <sys:String x:Key="Emu_HatariConfig">⚙ Hatari Configuration</sys:String>
+    <sys:String x:Key="Emu_TosRom">TOS ROM (optional)</sys:String>
+    <sys:String x:Key="Emu_TosRomHint">Leave empty to use the EmuTOS bundled with Hatari. For maximum compatibility, use a real TOS ROM dump (1.04/2.06 for ST/STE, 3.06 for TT, 4.0x for Falcon).</sys:String>
+    <sys:String x:Key="Emu_MachineType">Machine type</sys:String>
+    <sys:String x:Key="Emu_Monitor">Monitor type</sys:String>
+    <sys:String x:Key="Emu_StRam">ST-RAM size</sys:String>
+    <sys:String x:Key="Emu_TtRam">TT-RAM size</sys:String>
+    <sys:String x:Key="Emu_TtRamHint">TT-RAM only matters in TT or Falcon mode; has no effect in ST/STE mode.</sys:String>
+    <sys:String x:Key="Emu_HatariFullscreen">Start in full screen (--fullscreen)</sys:String>
+    <sys:String x:Key="Emu_Borders">Show overscan borders (--borders)</sys:String>
+    <sys:String x:Key="Emu_StatusBar">Show status bar (--statusbar)</sys:String>
+    <sys:String x:Key="Emu_DriveLed">Show drive activity LED overlay (--drive-led)</sys:String>
+    <sys:String x:Key="Emu_SaveHatari">💾  Save Hatari configuration</sys:String>
+
+    <sys:String x:Key="Emu_CpcecConfig">⚙ CPCEC Configuration</sys:String>
+    <sys:String x:Key="Emu_Ram">Memory (RAM)</sys:String>
+    <sys:String x:Key="Emu_CpcecFullscreen">Start in fullscreen (-W)</sys:String>
+    <sys:String x:Key="Emu_CpcecIndicators">Show onscreen indicators (disk drive, oscilloscope...)</sys:String>
+    <sys:String x:Key="Emu_CrtcType">CRTC type</sys:String>
+    <sys:String x:Key="Emu_CrtcTypeHint">Some productions require a specific CRTC to display correctly (e.g. CRTC0 for "PhX", CRTC1 for "Madness Demo"/"S&amp;KOH", CRTC3 for "Eerie Forest"). When in doubt, keep the default (1).</sys:String>
+
+    <sys:String x:Key="Emu_ZxsecConfig">⚙ ZXSEC Configuration</sys:String>
+    <sys:String x:Key="Emu_CsfecConfig">⚙ CSFEC Configuration</sys:String>
+    <sys:String x:Key="Emu_CsfecRamHint">64K is the standard Commodore 64 configuration. Higher levels require a memory expansion (GeoRAM/REU) that most C64 scene productions don't use.</sys:String>
+    <sys:String x:Key="Emu_MsxecConfig">⚙ MSXEC Configuration</sys:String>
+    <sys:String x:Key="Emu_MsxecRamHint">64K "with mapper" is the expected configuration on MSX2/MSX2+; "without mapper" targets compatibility with some pre-MSX2 software. Exact sizes for levels 2 to 6 aren't specified in the CPCEC documentation (2048K ceiling).</sys:String>
+
+    <sys:String x:Key="Emu_DosBoxXConfig">⚙ DOSBox-X Configuration</sys:String>
+    <sys:String x:Key="Emu_GraphicsCard">Graphics card</sys:String>
+    <sys:String x:Key="Emu_Memory">Memory</sys:String>
+    <sys:String x:Key="Emu_Cycles">CPU cycles</sys:String>
+    <sys:String x:Key="Emu_CyclesHint">"auto" works for most cases. If a demo is too fast/slow or stutters, try "max" or a fixed value (e.g. "fixed 4000") — often stated by the production itself or found on DOS scene wikis.</sys:String>
+    <sys:String x:Key="Emu_SoundBlaster">Sound card (Sound Blaster)</sys:String>
+    <sys:String x:Key="Emu_Gus">Gravis Ultrasound (GUS)</sys:String>
+    <sys:String x:Key="Emu_DosBoxXFullscreen">Start in fullscreen (-fullscreen)</sys:String>
+    <sys:String x:Key="Emu_SaveCpcec">💾  Save CPCEC configuration</sys:String>
+
+    <sys:String x:Key="Emu_ViceC64Config">⚙ VICE (C64) Configuration</sys:String>
+    <sys:String x:Key="Emu_SidEngine">SID engine</sys:String>
+    <sys:String x:Key="Emu_SidModel">SID chip model</sys:String>
+    <sys:String x:Key="Emu_Reu">REU memory expansion</sys:String>
+    <sys:String x:Key="Emu_ReuSize">REU size</sys:String>
+    <sys:String x:Key="Emu_TrueDrive">True drive emulation (drive 8)</sys:String>
+    <sys:String x:Key="Emu_TrueDriveHint">Needed for productions using a custom disk loader (common on multi-part C64 megademos); loads at the real speed of a 1541 instead of instantly. Leave unchecked for a simple .prg.</sys:String>
+    <sys:String x:Key="Emu_ViceFullscreen">Start in fullscreen (-VICIIfull)</sys:String>
+
+    <sys:String x:Key="Emu_ViceC128Config">⚙ VICE (C128) Configuration</sys:String>
+    <sys:String x:Key="Emu_Go64">Start in C64 mode (-go64)</sys:String>
+    <sys:String x:Key="Emu_Go64Hint">Unchecked: starts in native C128 mode (80 columns). Checked: switches directly to C64-compatible mode at startup — useful if the release specifically targets the C64 rather than native C128.</sys:String>
+    <sys:String x:Key="Emu_Columns">Columns</sys:String>
+
+    <sys:String x:Key="Emu_ViceVic20Config">⚙ VICE (VIC-20) Configuration</sys:String>
+    <sys:String x:Key="Emu_VicFullscreen">Start in fullscreen (-VICfull)</sys:String>
+
+    <sys:String x:Key="Emu_VicePetConfig">⚙ VICE (PET) Configuration</sys:String>
+    <sys:String x:Key="Emu_PetFullscreen">Start in fullscreen (-CRTCfull)</sys:String>
+
+    <sys:String x:Key="Emu_ViceC64DtvConfig">⚙ VICE (C64-DTV) Configuration</sys:String>
+    <sys:String x:Key="Emu_DtvRevision">DTV revision</sys:String>
+
+    <sys:String x:Key="Emu_VicePlus4Config">⚙ VICE (Plus/4, C16) Configuration</sys:String>
+    <sys:String x:Key="Emu_TedFullscreen">Start in fullscreen (-TEDfull)</sys:String>
+
+    <!-- ── Release edit (additional) ─────────────────────────────────────────── -->
+    <sys:String x:Key="RE_Title">TITLE</sys:String>
+    <sys:String x:Key="RE_Date">DATE</sys:String>
+    <sys:String x:Key="RE_ReleaseType">RELEASE TYPE</sys:String>
+    <sys:String x:Key="RE_Category">CATEGORY</sys:String>
+    <sys:String x:Key="RE_RatingHint">0 = unrated</sys:String>
+    <sys:String x:Key="RE_DateHint">1993 · 1993-08 · 1993-08-05</sys:String>
+    <sys:String x:Key="RE_Saving"> Saving…</sys:String>
+    <sys:String x:Key="App_SaveShort">✓ Save</sys:String>
+
+    <!-- ── Screenshots download ───────────────────────────────────────────────── -->
+    <sys:String x:Key="SS_Total">Total</sys:String>
+    <sys:String x:Key="SS_Errors">Errors</sys:String>
+    <sys:String x:Key="SS_AlreadyLocal">Already local</sys:String>
+    <sys:String x:Key="SS_Info">1 image / 500 ms · pause 5 s every 100 images · data © Demozoo contributors (CC BY 4.0)</sys:String>
+
+    <!-- ── DAT import ─────────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Dat_Updating">Updating DAT files...</sys:String>
+
+    <!-- ── List keyboard navigation (2026-07-29) ────────────────────────────────── -->
+    <sys:String x:Key="ScrollEnd_TooManyItems">List too large ({0:N0} items) to jump straight to the end — use Page Down to move forward.</sys:String>
+
+    <!-- ── Scan ROMs (2026-07-27) ─────────────────────────────────────────────── -->
+    <sys:String x:Key="ScanRoms_PickFolderTitle">Choose the folder to scan</sys:String>
+    <sys:String x:Key="ScanRoms_Subtitle">Looking for files matching the DATs catalog…</sys:String>
+    <sys:String x:Key="ScanRoms_Cancel">Cancel</sys:String>
+    <sys:String x:Key="ScanRoms_Close">Close</sys:String>
+    <sys:String x:Key="ScanRoms_Summary">{0} file(s) scanned · {1} archive(s) explored · {2} match(es) · {3} release(s) updated ({4} complete)</sys:String>
+    <sys:String x:Key="ScanRoms_Error">Error during scan: {0}</sys:String>
+
+    <!-- Explanation screen shown before the folder picker (2026-07-28) -->
+    <sys:String x:Key="Dlg_ScanRoms_Title">DemoBase — Scan for Releases</sys:String>
+    <sys:String x:Key="Dlg_ScanRoms_Heading">How does Scan for Releases work?</sys:String>
+    <sys:String x:Key="Dlg_ScanRoms_Body">Choose a folder: DemoBase looks at every file inside it (including inside archives) and compares each one to the DATs catalog by size and CRC32 checksum. Every recognized file is added to the matching release's ZIP, in your Releases folder. Files that aren't recognized are left untouched.</sys:String>
+    <sys:String x:Key="Dlg_ScanRoms_FormatsLabel">Supported archive formats</sys:String>
+    <sys:String x:Key="Dlg_ScanRoms_FormatsList">.zip · .7z · .rar · .gz / .tgz · .lzh / .lha · .bz2 · .tar · .zst</sys:String>
+    <sys:String x:Key="Dlg_ScanRoms_Partial">A release doesn't need to be found in full to be updated: files found are added even if some are still missing — you can scan several folders one after another to complete it progressively.</sys:String>
+
+    <!-- ── Releasers ──────────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Rel_Nicks">NICKS</sys:String>
+    <sys:String x:Key="Rel_Members">MEMBERS (</sys:String>
+
+    <!-- ── Parties ────────────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Party_Online">🌐 Online</sys:String>
+
+    <!-- ── Favorite soundtracks ───────────────────────────────────────────────── -->
+    <sys:String x:Key="Nav_FavSoundtracks">Favorite Soundtracks</sys:String>
+
+    <sys:String x:Key="RD_View">▶ View</sys:String>
+    <sys:String x:Key="RD_ClickView">Click "View" to display images</sys:String>
+
+    <sys:String x:Key="Pref_Bios">BIOS / FIRMWARE</sys:String>
+    <sys:String x:Key="Pref_BiosPackTitle">Recalbox BIOS Pack</sys:String>
+    <sys:String x:Key="Pref_BiosPackDesc">Downloads and installs the Recalbox BIOS pack (346 MD5-verified files) from GitHub — PS1, PS2, Dreamcast, Saturn, DS, GBA, Neo Geo, MSX, Amiga… Automatically configures DuckStation, PCSX2, Flycast and melonDS.</sys:String>
+    <sys:String x:Key="Pref_BiosPackButton">⬇ Download Recalbox pack</sys:String>
+    <sys:String x:Key="Pref_Recoil">RECOIL (recoil2png.exe)</sys:String>
+    <sys:String x:Key="Pref_RecoilDesc">Path to recoil2png.exe. If empty, looks in Externals
+ecoil2png.exe</sys:String>
+
+
+    <!-- Sidebar steps -->
+    <sys:String x:Key="Wiz_StepWelcome">Welcome</sys:String>
+    <sys:String x:Key="Wiz_StepFolders">Folders</sys:String>
+    <sys:String x:Key="Wiz_StepFoldersSub">ROMs &amp; emulators</sys:String>
+    <sys:String x:Key="Wiz_StepDatabase">Database</sys:String>
+    <sys:String x:Key="Wiz_StepDatabaseSub">Demozoo import</sys:String>
+    <sys:String x:Key="Wiz_StepEmulators">Emulators</sys:String>
+    <sys:String x:Key="Wiz_StepEmulatorsSub">Installation</sys:String>
+    <sys:String x:Key="Wiz_StepExternals">External tools</sys:String>
+    <sys:String x:Key="Wiz_StepExternalsSub">ZXTune, RECOIL</sys:String>
+    <sys:String x:Key="Wiz_StepBios">BIOS Pack</sys:String>
+    <sys:String x:Key="Wiz_StepBiosSub">Optional</sys:String>
+    <sys:String x:Key="Wiz_StepDats">DAT files</sys:String>
+    <sys:String x:Key="Wiz_StepDatsSub">ROM/production links</sys:String>
+    <sys:String x:Key="Wiz_StepReady">Ready!</sys:String>
+
+    <!-- Emulator install statuses -->
+    <sys:String x:Key="Emu_StatusNotInstalled">Not installed</sys:String>
+    <sys:String x:Key="Emu_StatusInstalled">✓ Installed</sys:String>
+    <sys:String x:Key="Emu_StatusStarting">Starting…</sys:String>
+    <sys:String x:Key="Emu_StatusChecking">Checking…</sys:String>
+    <sys:String x:Key="Emu_StatusUpToDate">✓ Up to date</sys:String>
+    <sys:String x:Key="Emu_StatusUpdateAvail">↑ Update available:</sys:String>
+    <!-- ── Wizard ───────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Wiz_SetupTitle">Initial Setup</sys:String>
+    <sys:String x:Key="Wiz_Cancel">Cancel</sys:String>
+    <sys:String x:Key="Wiz_Back">← Back</sys:String>
+    <sys:String x:Key="Wiz_Next">Next →</sys:String>
+    <sys:String x:Key="Wiz_Finish">Finish ✓</sys:String>
+    <sys:String x:Key="Wiz_Downloading">Downloading:</sys:String>
+
+    <!-- Welcome -->
+    <sys:String x:Key="Wiz_WelcomeTag">GREETINGS, CODER.</sys:String>
+    <sys:String x:Key="Wiz_WelcomeTitle">Welcome to</sys:String>
+    <sys:String x:Key="Wiz_WelcomeSubtitle">The demoscene catalog.</sys:String>
+    <sys:String x:Key="Wiz_WelcomeBody">This wizard will guide you through the initial setup of DemoBase.</sys:String>
+    <sys:String x:Key="Wiz_WelcomeBody2">In a few steps, you'll configure the ROM folders, download the Demozoo database, and install the emulators you need.</sys:String>
+    <sys:String x:Key="Wiz_WelcomeTip">Click Next to start the setup. These settings will be accessible at any time from Preferences.</sys:String>
+    <sys:String x:Key="Wiz_WelcomeNext">Next</sys:String>
+    <sys:String x:Key="Wiz_WelcomePrefs">Preferences</sys:String>
+
+    <!-- Folders -->
+    <sys:String x:Key="Wiz_FoldersTitle">Folders</sys:String>
+    <sys:String x:Key="Wiz_FoldersSubtitle">Choose where DemoBase will store its files. By default, everything is in the application's folder.</sys:String>
+    <sys:String x:Key="Wiz_FoldersBrowse">Choose a folder</sys:String>
+    <sys:String x:Key="Wiz_FoldersTip">💡 Folders will be created automatically if they don't exist. You can change them at any time in</sys:String>
+    <sys:String x:Key="Wiz_FoldersPrefs">Preferences</sys:String>
+    <sys:String x:Key="Wiz_FolderBiosLabel">BIOS</sys:String>
+    <sys:String x:Key="Wiz_FolderBiosDesc">Firmware and ROMs required by emulators (Amiga Kickstart, Atari TOS, etc.)</sys:String>
+    <sys:String x:Key="Wiz_FolderConfigsLabel">Configs</sys:String>
+    <sys:String x:Key="Wiz_FolderConfigsDesc">Configuration files generated for each emulator</sys:String>
+    <sys:String x:Key="Wiz_FolderDatabaseLabel">Database</sys:String>
+    <sys:String x:Key="Wiz_FolderDatabaseDesc">DemoBase SQLite database (demobase.db)</sys:String>
+    <sys:String x:Key="Wiz_FolderReleasesLabel">Releases</sys:String>
+    <sys:String x:Key="Wiz_FolderReleasesDesc">Folder containing release ZIP files (built automatically or added manually)</sys:String>
+    <sys:String x:Key="Wiz_FolderWorkingLabel">Working</sys:String>
+    <sys:String x:Key="Wiz_FolderWorkingDesc">DemoBase temp folder (extracted files, generated configs…) — cleared at startup</sys:String>
+
+    <!-- Database -->
+    <sys:String x:Key="Wiz_DatabaseBody">DemoBase needs the full Demozoo catalog to work: productions, groups, sceners, parties and download links.</sys:String>
+    <sys:String x:Key="Wiz_DatabaseBtn">⬇ Download and import the Demozoo database</sys:String>
+    <sys:String x:Key="Wiz_DatabaseMandatory">This step is mandatory: DemoBase cannot work without the Demozoo catalog.</sys:String>
+    <sys:String x:Key="Wiz_DatabaseWaiting">Waiting…</sys:String>
+    <sys:String x:Key="Wiz_DatabaseWaitingDl">Waiting for download…</sys:String>
+    <sys:String x:Key="Wiz_DatabaseConnecting">Connecting to data.demozoo.org…</sys:String>
+    <sys:String x:Key="Wiz_DatabaseDone2">Done</sys:String>
+    <sys:String x:Key="Wiz_DatabaseAlreadyImported">The Demozoo database was already imported in a previous session.</sys:String>
+    <sys:String x:Key="Wiz_DatabaseImportSuccess">The Demozoo database has been downloaded and imported successfully.</sys:String>
+    <sys:String x:Key="Wiz_DatabaseTitle">Database</sys:String>
+    <sys:String x:Key="Wiz_DatabaseSubtitle">Download the Demozoo database to access the full catalog.</sys:String>
+    <sys:String x:Key="Wiz_DatabaseNone">No database imported</sys:String>
+    <sys:String x:Key="Wiz_DatabaseNoneDesc">The full download is several hundred MB and may take a few minutes.</sys:String>
+    <sys:String x:Key="Wiz_DatabaseDownload">Download</sys:String>
+    <sys:String x:Key="Wiz_DatabaseImport">Importing into database</sys:String>
+    <sys:String x:Key="Wiz_DatabaseDone">Import complete</sys:String>
+    <sys:String x:Key="Wiz_DatabaseFailed">Import failed</sys:String>
+
+    <!-- 2026-07-25 : ImportProgressWindow (window shown by the main menu's "Demozoo
+         update" button — distinct from the DatabasePage wizard above, which was
+         already translated). -->
+    <sys:String x:Key="ImportProg_Subtitle">Demozoo database import</sys:String>
+    <sys:String x:Key="ImportProg_Preparing">Preparing…</sys:String>
+    <sys:String x:Key="ImportProg_PhaseDownload">Download</sys:String>
+    <sys:String x:Key="ImportProg_PhaseImporting">Importing</sys:String>
+    <sys:String x:Key="ImportProg_PhaseFinalizing">Finalizing</sys:String>
+    <sys:String x:Key="ImportProg_PhaseDone">Import complete</sys:String>
+    <sys:String x:Key="ImportProg_PhaseError">Error</sys:String>
+    <sys:String x:Key="ImportProg_DbPrefix">Database: {0}</sys:String>
+    <sys:String x:Key="ImportProg_RowsProcessed">{0} rows processed</sys:String>
+    <sys:String x:Key="ImportProg_StepOf">Step {0} of {1}</sys:String>
+    <sys:String x:Key="ImportProg_Legal">Data © Demozoo contributors (CC BY 4.0) — demozoo.org</sys:String>
+
+    <!-- DATs -->
+    <sys:String x:Key="Wiz_DatsBody">DAT files link Demozoo productions to their associated game/demo files. They are hosted separately on Mega.nz and updated regularly.</sys:String>
+    <sys:String x:Key="Wiz_DatsAlreadyImported">DAT files were already imported in a previous session.</sys:String>
+    <sys:String x:Key="Wiz_DatsImportSuccess">DAT files have been downloaded and imported successfully.</sys:String>
+    <sys:String x:Key="Wiz_DatsConnecting">Connecting to Mega.nz…</sys:String>
+    <sys:String x:Key="Wiz_DatsWaiting">Waiting…</sys:String>
+    <sys:String x:Key="Wiz_DatsWaitingDl">Waiting for download…</sys:String>
+    <sys:String x:Key="Wiz_DatsExtracting">Extracting archive…</sys:String>
+    <sys:String x:Key="Wiz_DatsImporting">Importing DAT files into database…</sys:String>
+    <sys:String x:Key="Wiz_DatsDownloading">Downloading… {0:0}%</sys:String>
+    <sys:String x:Key="Wiz_DatsDoneFile">Done — {0}</sys:String>
+    <sys:String x:Key="Wiz_DatsCleaningUp">Cleaning up…</sys:String>
+    <sys:String x:Key="Wiz_DatsTitle">DAT files</sys:String>
+    <sys:String x:Key="Wiz_DatsSubtitle">Download the DAT files to link productions to ROM files.</sys:String>
+    <sys:String x:Key="Wiz_DatsNone">No DAT file imported</sys:String>
+    <sys:String x:Key="Wiz_DatsNoneDesc">The package is downloaded from Mega.nz, then automatically integrated into the database.</sys:String>
+    <sys:String x:Key="Wiz_DatsDownload">Download</sys:String>
+    <sys:String x:Key="Wiz_DatsImport">Importing into database</sys:String>
+    <sys:String x:Key="Wiz_DatsDone">Import complete</sys:String>
+    <sys:String x:Key="Wiz_DatsFailed">Import failed</sys:String>
+
+    <!-- Emulators -->
+    <sys:String x:Key="Wiz_EmuTitle">Emulators</sys:String>
+    <sys:String x:Key="Wiz_EmuSubtitle">Install the portable emulators needed to launch productions. You can add or update them at any time from Preferences.</sys:String>
+    <sys:String x:Key="Wiz_EmuSelectTitle">Select emulators to install</sys:String>
+    <sys:String x:Key="Wiz_EmuSelectDesc">Already installed emulators are unchecked. You can skip this step.</sys:String>
+    <sys:String x:Key="Wiz_EmuSelectNone">None</sys:String>
+    <sys:String x:Key="Wiz_EmuInstallBtn">⬇ Install selected (</sys:String>
+    <sys:String x:Key="Wiz_EmuSelectAll">All</sys:String>
+    <sys:String x:Key="Wiz_EmuColName">Emulator</sys:String>
+    <sys:String x:Key="Wiz_EmuColVersion">Version</sys:String>
+    <sys:String x:Key="Wiz_EmuColStatus">Status</sys:String>
+    <sys:String x:Key="Wiz_EmuRetry">Retry</sys:String>
+    <sys:String x:Key="Wiz_EmuErrorDetails">View error details</sys:String>
+
+    <!-- Externals -->
+    <sys:String x:Key="Wiz_ExtTitle">External Tools</sys:String>
+    <sys:String x:Key="Wiz_ExtSubtitle">DemoBase uses a few external tools behind the scenes: ZXTune and UADE for audio playback of exotic chiptune/Amiga formats, and RECOIL for displaying graphics formats from old computers. You can add or update them at any time from Preferences.</sys:String>
+
+    <!-- Ready -->
+    <sys:String x:Key="Wiz_ReadyTitle">Everything is ready!</sys:String>
+    <sys:String x:Key="Wiz_ReadySeeding">Registering emulators in the database…</sys:String>
+
+    <!-- Emulator settings panel -->
+    <sys:String x:Key="Emu_Title">Emulators</sys:String>
+    <sys:String x:Key="Emu_DownloadBios">💾 BIOS Pack</sys:String>
+    <sys:String x:Key="Emu_DownloadUpdate">⬇ Download / Update</sys:String>
+    <sys:String x:Key="Emu_DownloadUpdateTip">Download missing emulators, retry failed downloads, or check for updates</sys:String>
+
+    <!-- Release type translation -->
+    <sys:String x:Key="Pref_ReleaseTypes">RELEASE TYPES</sys:String>
+    <sys:String x:Key="Pref_ReleaseTypesTitle">French translation</sys:String>
+    <sys:String x:Key="Pref_ReleaseTypesDesc">Translates release types to French in the database (Démo, Intro, Graphique Exécutable…).</sys:String>
+    <sys:String x:Key="Pref_ReleaseTypesBtn">⟳ Apply translations</sys:String>
+
+    <!-- Wizard BIOS page -->
+    <sys:String x:Key="Wiz_BiosTitle">BIOS Pack</sys:String>
+    <sys:String x:Key="Wiz_BiosSubtitle">Download the Recalbox BIOS pack (346 verified files) so your emulators work correctly. This step is optional — you can do it later.</sys:String>
+
+    <!-- Wizard confirmations -->
+    <sys:String x:Key="Wiz_ConfirmTitle">Continue?</sys:String>
+    <sys:String x:Key="Wiz_EmuNoInstallConfirm">No emulator has been installed.
+
+You will not be able to launch productions without emulators.
+
+Do you want to continue anyway?</sys:String>
+
+    <!-- ── "How to quit the emulator" info popups (TR-DOS, blueMSX, WinUAE, Hatari) ── -->
+    <sys:String x:Key="Dlg_DontShowAgain">Don't show this message again</sys:String>
+    <sys:String x:Key="Dlg_Understood">Got it</sys:String>
+
+    <sys:String x:Key="Dlg_TrDos_Title">TR-DOS disk</sys:String>
+    <sys:String x:Key="Dlg_TrDos_Heading">💾 This game is on a TR-DOS disk</sys:String>
+    <sys:String x:Key="Dlg_TrDos_Body">ZEsarUX mounts the disk but doesn't load it automatically — just like on a real Spectrum, you need to type two commands yourself once the emulator is open:</sys:String>
+    <sys:String x:Key="Dlg_TrDos_Cmd1">RANDOMIZE USR 15616</sys:String>
+    <sys:String x:Key="Dlg_TrDos_Cmd1Desc">then [ENTER] — opens TR-DOS and shows the catalog (the list of files on the disk).</sys:String>
+    <sys:String x:Key="Dlg_TrDos_Cmd2">RUN "NAME"</sys:String>
+    <sys:String x:Key="Dlg_TrDos_Cmd2Desc">then [ENTER] — replace NAME with the exact name shown in the catalog, to load and run the program.</sys:String>
+
+    <sys:String x:Key="Dlg_BlueMSX_Title">blueMSX</sys:String>
+    <sys:String x:Key="Dlg_BlueMSX_Heading">⌨ How to quit blueMSX</sys:String>
+    <sys:String x:Key="Dlg_BlueMSX_Body">blueMSX has no "Close" button or classic Alt+F4 shortcut — you need to use its own key combination:</sys:String>
+    <sys:String x:Key="Dlg_BlueMSX_Shortcut">Left Ctrl + Pause</sys:String>
+    <sys:String x:Key="Dlg_BlueMSX_ShortcutDesc">immediately closes the emulator — this is blueMSX's official "Exit" shortcut.</sys:String>
+
+    <sys:String x:Key="Dlg_WinUAE_Title">WinUAE</sys:String>
+    <sys:String x:Key="Dlg_WinUAE_Heading">⌨ How to quit WinUAE</sys:String>
+    <sys:String x:Key="Dlg_WinUAE_Body">WinUAE has no "Close" button or classic Alt+F4 shortcut in full screen — you need to use its own key combination:</sys:String>
+    <sys:String x:Key="Dlg_WinUAE_Shortcut">Ctrl + F11</sys:String>
+    <sys:String x:Key="Dlg_WinUAE_ShortcutDesc">closes the emulator.</sys:String>
+
+    <sys:String x:Key="Dlg_Hatari_Title">Hatari</sys:String>
+    <sys:String x:Key="Dlg_Hatari_Heading">⌨ How to quit Hatari</sys:String>
+    <sys:String x:Key="Dlg_Hatari_Body">Hatari has no "Close" button or classic Alt+F4 shortcut — you need to use its own key combination:</sys:String>
+    <sys:String x:Key="Dlg_Hatari_Shortcut">AltGr + Q</sys:String>
+    <sys:String x:Key="Dlg_Hatari_ShortcutDesc">closes the emulator (AltGr = right Alt key). Alternatively, F12 opens the Hatari menu, which also has a "Quit" button.</sys:String>
+
+    <sys:String x:Key="Dlg_DosBoxX_Title">DOSBox-X</sys:String>
+    <sys:String x:Key="Dlg_DosBoxX_Heading">⌨ How to quit DOSBox-X</sys:String>
+    <sys:String x:Key="Dlg_DosBoxX_Body">Closing the window (X button or Alt+F4) while a demo is running brings up a DOSBox-X confirmation prompt. To skip it:</sys:String>
+    <sys:String x:Key="Dlg_DosBoxX_Shortcut">Ctrl + F9</sys:String>
+    <sys:String x:Key="Dlg_DosBoxX_ShortcutDesc">quits immediately, no confirmation. Otherwise, DOSBox-X closes on its own once the demo ends by itself.</sys:String>
+
+    <!-- ── Launching a release not yet covered by a DAT (2026-07-25) ── -->
+    <sys:String x:Key="Dlg_Cancel">Cancel</sys:String>
+    <sys:String x:Key="Dlg_Download">Download</sys:String>
+
+    <sys:String x:Key="Dlg_ExtDownload_Title">File not yet in a DAT</sys:String>
+    <sys:String x:Key="Dlg_ExtDownload_Heading">This release isn't covered by a DAT yet</sys:String>
+    <sys:String x:Key="Dlg_ExtDownload_Body">The DAT is only rebuilt about once a month, while the Demozoo database is updated more often — this release is already there, just not in the DAT yet.</sys:String>
+    <sys:String x:Key="Dlg_ExtDownload_FilePrefix">File: </sys:String>
+    <sys:String x:Key="Dlg_ExtDownload_HostPrefix">From: </sys:String>
+    <sys:String x:Key="Dlg_ExtDownload_Warning">This file hasn't been verified — no CRC check like DAT/Mega files get. Download and launch it anyway?</sys:String>
+
+    <sys:String x:Key="Dlg_NoConfig_Title">Emulator not configured</sys:String>
+    <sys:String x:Key="Dlg_NoConfig_Heading">No emulator is configured for this platform</sys:String>
+    <sys:String x:Key="Dlg_NoConfig_Body">Go to Emulators to set one up.</sys:String>
+
+    <sys:String x:Key="Dlg_NoFile_Title">File not found</sys:String>
+    <sys:String x:Key="Dlg_NoFile_Heading">No file available for this release</sys:String>
+    <sys:String x:Key="Dlg_NoFile_Body">No ROM file was found in the DATs, and no direct download link is available on Demozoo for this release (only non-downloadable external references — group page, social media… — are attached, if any).</sys:String>
+
+    <!-- ── PlatformPickerWindow / FilePickerWindow (2026-07-25) ── -->
+    <sys:String x:Key="Dlg_Launch">Launch</sys:String>
+
+    <sys:String x:Key="PPick_Title">Choose a platform</sys:String>
+    <sys:String x:Key="PPick_Heading">Several platforms are available for this release</sys:String>
+    <sys:String x:Key="PPick_FilePrefix">File: </sys:String>
+    <sys:String x:Key="PPick_Body">Choose the profile (and therefore the platform) to use to launch this file. This choice will be remembered — you won't be asked again next time.</sys:String>
+    <sys:String x:Key="PPick_NoneSelected_Title">No profile selected</sys:String>
+    <sys:String x:Key="PPick_NoneSelected_Heading">No profile is selected in the list</sys:String>
+    <sys:String x:Key="PPick_NoneSelected_Body">Please choose a profile from the list first.</sys:String>
+
+    <sys:String x:Key="FPick_Title">Choose a file</sys:String>
+    <sys:String x:Key="FPick_Heading">Several files are available for this release</sys:String>
+    <sys:String x:Key="FPick_Body">Choose the file (and therefore the version/platform) to launch. This choice will be remembered — you won't be asked again next time, unless you click 'Use' on another file in the Files tab. Hover over a file to see its contents.</sys:String>
+    <sys:String x:Key="FPick_NoneSelected_Title">No file selected</sys:String>
+    <sys:String x:Key="FPick_NoneSelected_Heading">No file is selected in the list</sys:String>
+    <sys:String x:Key="FPick_NoneSelected_Body">Please choose a file from the list first.</sys:String>
+    <sys:String x:Key="FPick_EmptyArchive">(empty archive)</sys:String>
+    <sys:String x:Key="FPick_PlatformTBD">Platform to choose</sys:String>
+    <sys:String x:Key="FPick_PlatformGuessed">{0} (estimated)</sys:String>
+    <sys:String x:Key="FPick_UnitBytes">B</sys:String>
+    <sys:String x:Key="FPick_UnitKB">KB</sys:String>
+    <sys:String x:Key="FPick_UnitMB">MB</sys:String>
+
+    <!-- ── "Music (modland)" tab (2026-07-30) ───────────────────────────────── -->
+    <sys:String x:Key="Modland_TabTitle">Modland</sys:String>
+    <sys:String x:Key="Modland_Title">Music (modland)</sys:String>
+    <sys:String x:Key="Modland_Refresh">↻ Refresh</sys:String>
+    <sys:String x:Key="Modland_ByFormat">By format</sys:String>
+    <sys:String x:Key="Modland_ByAuthor">By author</sys:String>
+    <sys:String x:Key="Modland_AuthorModeHint">Search for an author in the column on the right — all formats are included in this mode.</sys:String>
+    <sys:String x:Key="Modland_Authors">AUTHORS</sys:String>
+    <sys:String x:Key="Modland_GoUpFolder">Go up one level</sys:String>
+    <sys:String x:Key="Modland_Tracks">TRACKS</sys:String>
+    <sys:String x:Key="Modland_PlayAll">▶▶ Play all</sys:String>
+    <sys:String x:Key="Modland_ToggleFavorite">Add/remove from favorites</sys:String>
+    <sys:String x:Key="Modland_NoTrackPlaying">Select a track to listen to</sys:String>
+    <sys:String x:Key="Modland_Downloading">Downloading…</sys:String>
+</ResourceDictionary>
