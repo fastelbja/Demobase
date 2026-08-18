@@ -1,0 +1,73 @@
+<Window x:Class="DemoBase.App.Views.StartupFilePickerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sélectionner le fichier à lancer"
+        Width="560" SizeToContent="Height" MaxHeight="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/DemoBase.App;component/Themes/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Margin="24">
+        <!-- Titre -->
+        <TextBlock Text="Fichier de démarrage (Startup-Sequence)"
+                   FontSize="14" FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,6"/>
+
+        <!-- Sous-titre -->
+        <TextBlock TextWrapping="Wrap" FontSize="12"
+                   Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,16">
+            Plusieurs fichiers exécutables ont été trouvés dans l'archive. Sélectionnez
+            celui à lancer — ce choix sera mémorisé pour cette release.
+        </TextBlock>
+
+        <!-- Liste des candidats -->
+        <Border BorderBrush="{DynamicResource Border}" BorderThickness="1"
+                CornerRadius="6" Margin="0,0,0,16" MaxHeight="300">
+            <ListBox x:Name="FileList"
+                     Background="{DynamicResource BgHover}"
+                     BorderThickness="0"
+                     FontFamily="Consolas" FontSize="12"
+                     Foreground="{DynamicResource TextPrimary}"
+                     Padding="4"
+                     SelectionMode="Single"
+                     MouseDoubleClick="FileList_MouseDoubleClick">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                        <Setter Property="Padding"    Value="8,5"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource Accent}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource BgCard}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+        </Border>
+
+        <!-- Boutons -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="CancelButton" Content="Annuler"
+                    Padding="16,8" Margin="0,0,8,0"
+                    Style="{StaticResource IconButton}"
+                    Click="Cancel_Click"/>
+            <Button x:Name="OkButton" Content="▶ Lancer avec ce fichier"
+                    Padding="16,8"
+                    Style="{StaticResource AccentButton}"
+                    IsDefault="True"
+                    Click="Ok_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

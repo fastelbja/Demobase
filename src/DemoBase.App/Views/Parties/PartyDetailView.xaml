@@ -1,0 +1,386 @@
+<UserControl x:Class="DemoBase.App.Views.Parties.PartyDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource BgApp}">
+
+    <Grid>
+        <!-- Chargement -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+            <ProgressBar IsIndeterminate="True" Width="120" Height="4"
+                         Foreground="{DynamicResource Accent}"
+                         Background="{DynamicResource BgHover}" BorderThickness="0"/>
+            <TextBlock Text="{DynamicResource App_Loading}" FontSize="12"
+                       Foreground="{DynamicResource TextMuted}"
+                       HorizontalAlignment="Center" Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <!-- Erreur -->
+        <Border Padding="20" VerticalAlignment="Center" HorizontalAlignment="Center"
+                Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibility}}">
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Foreground="{DynamicResource Red}" FontSize="13" TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Contenu -->
+        <DockPanel Visibility="{Binding Party, Converter={StaticResource NullToVisibility}}">
+
+            <!-- ── Header ─────────────────────────────────────────────── -->
+            <Border DockPanel.Dock="Top"
+                    Background="{DynamicResource BgPanel}"
+                    BorderBrush="{DynamicResource Border}"
+                    BorderThickness="0,0,0,1"
+                    Padding="24,18">
+                <DockPanel>
+
+                    <Button DockPanel.Dock="Left"
+                            Width="32" Height="32" Margin="0,0,12,0"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource IconButton}"
+                            ToolTip="{DynamicResource Nav_Parties}"
+                            Command="{Binding GoBackToListCommand}">
+                        <TextBlock Text="←" FontSize="16"
+                                   Foreground="{DynamicResource TextSecondary}"/>
+                    </Button>
+
+                    <StackPanel>
+                        <!-- Nom + drapeau -->
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Margin="8,0,0,0"
+                                        HorizontalAlignment="Right"
+                                        Visibility="{Binding Party.CountryCode,
+                                            Converter={StaticResource NullToVisibility}}">
+                                <Image Width="32" Height="22"
+                                       HorizontalAlignment="Center"
+                                       RenderOptions.BitmapScalingMode="HighQuality">
+                                    <Image.Source>
+                                        <Binding Path="Party.CountryCode"
+                                                 Converter="{StaticResource CountryFlagConverter}"/>
+                                    </Image.Source>
+                                </Image>
+                                <TextBlock FontSize="10" HorizontalAlignment="Center"
+                                           Foreground="{DynamicResource TextMuted}"
+                                           Margin="0,2,0,0">
+                                    <TextBlock.Text>
+                                        <Binding Path="Party.CountryCode"
+                                                 Converter="{StaticResource CountryNameConverter}"/>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBlock Text="{Binding Party.Name}"
+                                       FontSize="21" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}"/>
+                        </DockPanel>
+
+                        <!-- Tagline -->
+                        <TextBlock Text="{Binding Party.Tagline}"
+                                   FontSize="13" FontStyle="Italic"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   Margin="0,3,0,0"
+                                   Visibility="{Binding Party.Tagline,
+                                       Converter={StaticResource NullToVisibility}}"/>
+
+                        <!-- Badges méta -->
+                        <WrapPanel Margin="0,8,0,0">
+
+                            <!-- Série -->
+                            <Border CornerRadius="3" Padding="7,2" Margin="0,0,6,0"
+                                    Background="{DynamicResource BgHover}"
+                                    Visibility="{Binding Party.PartySeries,
+                                        Converter={StaticResource NullToVisibility}}">
+                                <TextBlock Text="{Binding Party.PartySeries.Name}"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource TextAccent}"/>
+                            </Border>
+
+                            <!-- Dates -->
+                            <Border CornerRadius="3" Padding="7,2" Margin="0,0,6,0"
+                                    Background="{DynamicResource BgHover}"
+                                    Visibility="{Binding DateRange,
+                                        Converter={StaticResource NullToVisibility}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="📅 " FontSize="11"/>
+                                    <TextBlock Text="{Binding DateRange}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TextSecondary}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Lieu -->
+                            <Border CornerRadius="3" Padding="7,2" Margin="0,0,6,0"
+                                    Background="{DynamicResource BgHover}"
+                                    Visibility="{Binding Party.Location,
+                                        Converter={StaticResource NullToVisibility}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="📍 " FontSize="11"/>
+                                    <TextBlock Text="{Binding Party.Location}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TextSecondary}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Online -->
+                            <Border CornerRadius="3" Padding="7,2" Margin="0,0,6,0"
+                                    Background="{DynamicResource BgHover}"
+                                    Visibility="{Binding Party.IsOnline,
+                                        Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="{DynamicResource Party_Online}" FontSize="11"
+                                           Foreground="{DynamicResource TextSecondary}"/>
+                            </Border>
+
+                            <!-- Stats -->
+                            <Border CornerRadius="3" Padding="7,2" Margin="0,0,6,0"
+                                    Background="{DynamicResource BgHover}">
+                                <TextBlock FontSize="11"
+                                           Foreground="{DynamicResource TextMuted}">
+                                    <Run Text="{Binding TotalCompetitions, Mode=OneWay}"/>
+                                    <Run Text="{DynamicResource Count_Competitions}"/>
+                                    <Run Text="{Binding TotalEntries, Mode=OneWay}"/>
+                                    <Run Text="{DynamicResource Count_Entries}"/>
+                                </TextBlock>
+                            </Border>
+                        </WrapPanel>
+
+                        <!-- Site web -->
+                        <Button Style="{StaticResource LinkButton}"
+                                Content="{Binding Party.Website}"
+                                FontSize="11" Margin="0,6,0,0"
+                                Click="BtnWebsite_Click"
+                                Visibility="{Binding Party.Website,
+                                    Converter={StaticResource NullToVisibility}}"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- ── Corps : liste des compétitions ─────────────────────── -->
+            <ScrollViewer x:Name="Scroll"
+                          DockPanel.Dock="Bottom"
+                          Style="{StaticResource SlimScrollViewer}"
+                          Padding="24,16,24,24">
+                <StackPanel>
+                    <ItemsControl ItemsSource="{Binding Competitions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <!-- Bloc compétition -->
+                                <Border Background="{DynamicResource BgCard}"
+                                        BorderBrush="{DynamicResource Border}"
+                                        BorderThickness="1"
+                                        CornerRadius="{StaticResource RadiusLg}"
+                                        Margin="0,0,0,12">
+                                    <StackPanel>
+
+                                        <!-- En-tête compétition (cliquable pour réduire) -->
+                                        <Border x:Name="CompHeader"
+                                                Padding="16,12"
+                                                Cursor="Hand">
+                                            <Border.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick"
+                                                    Command="{Binding ToggleExpandedCommand}"/>
+                                            </Border.InputBindings>
+                                            <DockPanel>
+                                                <TextBlock DockPanel.Dock="Right"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource TextMuted}"
+                                                           VerticalAlignment="Center">
+                                                    <Run Text="{Binding EntryCount, Mode=OneWay}"/>
+                                                    <Run Text="{DynamicResource Count_Entries}"/>
+                                                </TextBlock>
+                                                <!-- Flèche expand/collapse -->
+                                                <TextBlock DockPanel.Dock="Right"
+                                                           Margin="0,0,8,0"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource TextMuted}"
+                                                           VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="▲"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+                                                                    <Setter Property="Text" Value="▼"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontSize="14" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource TextPrimary}"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!-- Liste des placings -->
+                                        <StackPanel Visibility="{Binding IsExpanded,
+                                                        Converter={StaticResource BoolToVisibility}}">
+                                            <Separator Style="{StaticResource HRule}" Margin="0"/>
+                                            <ItemsControl ItemsSource="{Binding Placings}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border x:Name="PlacingBd"
+                                                                Padding="16,10"
+                                                                Background="Transparent"
+                                                                BorderBrush="{DynamicResource Border}"
+                                                                BorderThickness="0,0,0,1"
+                                                                Cursor="Hand">
+                                                            <Border.InputBindings>
+                                                                <MouseBinding MouseAction="LeftClick"
+                                                                    Command="{Binding DataContext.OpenReleaseCommand,
+                                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    CommandParameter="{Binding ReleaseId}"/>
+                                                            </Border.InputBindings>
+
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="52"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <!-- Rang -->
+                                                                <TextBlock Grid.Column="0"
+                                                                           Text="{Binding RankLabel}"
+                                                                           VerticalAlignment="Center">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="FontSize" Value="12"/>
+                                                                            <Setter Property="FontWeight" Value="Normal"/>
+                                                                            <Setter Property="Foreground"
+                                                                                    Value="{DynamicResource TextMuted}"/>
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsTopThree}" Value="True">
+                                                                                    <Setter Property="Foreground"
+                                                                                            Value="{DynamicResource Gold}"/>
+                                                                                    <Setter Property="FontWeight"
+                                                                                            Value="SemiBold"/>
+                                                                                    <Setter Property="FontSize" Value="13"/>
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+
+                                                                <!-- Icône + Titre + type + plateforme + auteur -->
+                                                                <StackPanel Grid.Column="1">
+                                                                    <DockPanel>
+                                                                        <!-- Icône type -->
+                                                                        <TextBlock FontSize="13"
+                                                                                   Margin="0,0,6,0"
+                                                                                   VerticalAlignment="Center"
+                                                                                   DockPanel.Dock="Left">
+                                                                            <TextBlock.Style>
+                                                                                <Style TargetType="TextBlock">
+                                                                                    <Setter Property="Text"
+                                                                                            Value="{Binding ReleaseType,
+                                                                                                Converter={StaticResource ReleaseTypeIcon}}"/>
+                                                                                    <Style.Triggers>
+                                                                                        <DataTrigger Binding="{Binding ReleaseType}" Value="">
+                                                                                            <Setter Property="Text"
+                                                                                                    Value="{Binding Supertype,
+                                                                                                        Converter={StaticResource ReleaseTypeIcon}}"/>
+                                                                                        </DataTrigger>
+                                                                                    </Style.Triggers>
+                                                                                </Style>
+                                                                            </TextBlock.Style>
+                                                                        </TextBlock>
+                                                                        <TextBlock Text="{Binding Title}"
+                                                                                   FontSize="13"
+                                                                                   FontWeight="SemiBold"
+                                                                                   TextTrimming="CharacterEllipsis">
+                                                                            <TextBlock.Style>
+                                                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                                    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                                                                    <Style.Triggers>
+                                                                                        <!-- Titre atténué : aucun fichier exploitable pour cette
+                                                                                             release (cf. badge 🚫 colonne droite), même logique que
+                                                                                             ReleaseListView/ReleaserDetailView. -->
+                                                                                        <DataTrigger Binding="{Binding HasNoFile}" Value="True">
+                                                                                            <Setter Property="Foreground" Value="{DynamicResource TextMuted}"/>
+                                                                                        </DataTrigger>
+                                                                                    </Style.Triggers>
+                                                                                </Style>
+                                                                            </TextBlock.Style>
+                                                                        </TextBlock>
+                                                                    </DockPanel>
+                                                                    <WrapPanel Margin="0,3,0,0">
+                                                                        <Border CornerRadius="3" Padding="5,1"
+                                                                                Background="{DynamicResource BgHover}"
+                                                                                Margin="0,0,6,0"
+                                                                                Visibility="{Binding ReleaseType,
+                                                                                    Converter={StaticResource NullToVisibility}}">
+                                                                            <TextBlock Text="{Binding ReleaseType}"
+                                                                                       FontSize="10"
+                                                                                       Foreground="{DynamicResource TextSecondary}"/>
+                                                                        </Border>
+                                                                        <TextBlock Text="{Binding Platforms}"
+                                                                                   FontSize="11"
+                                                                                   Foreground="{DynamicResource TextMuted}"
+                                                                                   Visibility="{Binding Platforms,
+                                                                                       Converter={StaticResource NullToVisibility}}"/>
+                                                                        <TextBlock Text="{Binding AuthorNames}"
+                                                                                   FontSize="11" Margin="8,0,0,0"
+                                                                                   Foreground="{DynamicResource TextAccent}"
+                                                                                   Visibility="{Binding AuthorNames,
+                                                                                       Converter={StaticResource NullToVisibility}}"
+                                                                                   TextTrimming="CharacterEllipsis"/>
+                                                                    </WrapPanel>
+                                                                </StackPanel>
+
+                                                                <!-- Score optionnel + badge "aucun fichier" -->
+                                                                <StackPanel Grid.Column="2"
+                                                                            VerticalAlignment="Center"
+                                                                            Margin="12,0,0,0"
+                                                                            HorizontalAlignment="Right">
+                                                                    <!-- Aucun fichier exploitable — même badge que
+                                                                         ReleaseListView/ReleaserDetailView. -->
+                                                                    <TextBlock Text="🚫"
+                                                                               FontSize="11"
+                                                                               Foreground="{DynamicResource Red}"
+                                                                               HorizontalAlignment="Right"
+                                                                               Margin="0,0,0,2"
+                                                                               ToolTip="Aucun fichier disponible pour cette release (référence vidéo uniquement, le cas échéant)"
+                                                                               Visibility="{Binding HasNoFile,
+                                                                                   Converter={StaticResource BoolToVisibility}}"/>
+                                                                    <TextBlock Text="{Binding Score}"
+                                                                               FontSize="11"
+                                                                               Foreground="{DynamicResource TextMuted}"
+                                                                               HorizontalAlignment="Right"
+                                                                               Visibility="{Binding Score,
+                                                                                   Converter={StaticResource NullToVisibility}}"/>
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Border>
+                                                        <DataTemplate.Triggers>
+                                                            <DataTrigger Value="True">
+                                                                <DataTrigger.Binding>
+                                                                    <MultiBinding Converter="{StaticResource ReferenceEquality}">
+                                                                        <Binding Path="."/>
+                                                                        <Binding Path="DataContext.SelectedPlacing"
+                                                                                 RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                    </MultiBinding>
+                                                                </DataTrigger.Binding>
+                                                                <Setter TargetName="PlacingBd" Property="Background"
+                                                                        Value="{DynamicResource BgSelected}"/>
+                                                                <Setter TargetName="PlacingBd" Property="BorderBrush"
+                                                                        Value="{DynamicResource Accent}"/>
+                                                                <Setter TargetName="PlacingBd" Property="BorderThickness"
+                                                                        Value="2,0,0,0"/>
+                                                            </DataTrigger>
+                                                            <Trigger SourceName="PlacingBd" Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="PlacingBd" Property="Background"
+                                                                        Value="{DynamicResource BgHover}"/>
+                                                            </Trigger>
+                                                        </DataTemplate.Triggers>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </Grid>
+</UserControl>

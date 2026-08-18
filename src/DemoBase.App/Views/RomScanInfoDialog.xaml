@@ -1,0 +1,63 @@
+<Window x:Class="DemoBase.App.Views.RomScanInfoDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Dlg_ScanRoms_Title}"
+        Width="480" SizeToContent="Height" MaxHeight="560"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Background="{DynamicResource BgApp}">
+
+    <!-- 2026-07-28 (demande utilisateur : "peux tu mettre un écran explicatif au design
+         'demobase' lorsque je clique sur 'Recherche de releases' ?") — même gabarit que
+         WinUAEInfoDialog/HatariInfoDialog/DosBoxXInfoDialog (titre/heading/corps/encart
+         mis en valeur/case "ne plus afficher"/bouton "Compris"), affiché juste avant le
+         sélecteur de dossier, pour expliquer ce que fait le scan avant que l'utilisateur
+         choisisse un dossier. -->
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/DemoBase.App;component/Themes/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Margin="24">
+        <TextBlock Text="{DynamicResource Dlg_ScanRoms_Heading}"
+                   FontSize="14" FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,10"/>
+
+        <TextBlock Text="{DynamicResource Dlg_ScanRoms_Body}"
+                   TextWrapping="Wrap" FontSize="12"
+                   Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,14"/>
+
+        <Border Background="{DynamicResource BgSurface}" CornerRadius="6" Padding="14,12" Margin="0,0,0,14">
+            <StackPanel>
+                <TextBlock FontSize="11" FontWeight="Bold"
+                           Foreground="{DynamicResource Accent}" Margin="0,0,0,4"
+                           Text="{DynamicResource Dlg_ScanRoms_FormatsLabel}"/>
+                <TextBlock TextWrapping="Wrap" FontFamily="Consolas" FontSize="11"
+                           Foreground="{DynamicResource TextSecondary}"
+                           Text="{DynamicResource Dlg_ScanRoms_FormatsList}"/>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="{DynamicResource Dlg_ScanRoms_Partial}"
+                   TextWrapping="Wrap" FontSize="12"
+                   Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,18"/>
+
+        <CheckBox x:Name="DontShowAgainCheck" Content="{DynamicResource Dlg_DontShowAgain}"
+                   Foreground="{DynamicResource TextSecondary}" FontSize="12"
+                   Margin="0,0,0,18"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="{DynamicResource ScanRoms_Cancel}" Click="Cancel_Click"
+                    Padding="18,7" FontSize="12"
+                    Style="{StaticResource IconButton}" Margin="0,0,10,0"/>
+            <Button Content="{DynamicResource Dlg_Understood}" Click="Ok_Click"
+                    Padding="24,8" FontSize="12"
+                    Style="{StaticResource AccentButton}"
+                    IsDefault="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

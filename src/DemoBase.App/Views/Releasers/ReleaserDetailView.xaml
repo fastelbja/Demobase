@@ -1,0 +1,561 @@
+<UserControl x:Class="DemoBase.App.Views.Releasers.ReleaserDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrl="clr-namespace:DemoBase.App.Controls"
+             x:Name="Root"
+             Background="{DynamicResource BgApp}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- Chargement -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+            <ProgressBar IsIndeterminate="True" Width="120" Height="4"
+                         Foreground="{DynamicResource Accent}"
+                         Background="{DynamicResource BgHover}" BorderThickness="0"/>
+            <TextBlock Text="{DynamicResource App_Loading}" FontSize="12" Foreground="{DynamicResource TextMuted}"
+                       HorizontalAlignment="Center" Margin="0,8,0,0"/>
+        </StackPanel>
+
+        <!-- Erreur -->
+        <Border Padding="20" VerticalAlignment="Center" HorizontalAlignment="Center"
+                Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibility}}">
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Foreground="{DynamicResource Red}" FontSize="13" TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Contenu -->
+        <Grid Visibility="{Binding Releaser, Converter={StaticResource NullToVisibility}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ── Header ─────────────────────────────────────────────── -->
+            <Border Grid.Row="0" x:Name="HeaderBorder"
+                    Background="{DynamicResource BgPanel}"
+                    BorderBrush="{DynamicResource Border}"
+                    BorderThickness="0,0,0,1" Padding="24,18">
+                <DockPanel>
+                    <!-- Avatar initiales -->
+                    <Border DockPanel.Dock="Left" Width="52" Height="52"
+                            CornerRadius="26" Background="{DynamicResource Accent}"
+                            Margin="0,0,16,0" VerticalAlignment="Top">
+                        <TextBlock Text="{Binding Releaser.DisplayName,
+                                       Converter={StaticResource InitialsConverter}}"
+                                   FontSize="18" FontWeight="SemiBold" Foreground="White"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel VerticalAlignment="Center">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Margin="8,0,0,0"
+                                        HorizontalAlignment="Right"
+                                        Visibility="{Binding Releaser.Country,
+                                            Converter={StaticResource NullToVisibility}}">
+                                <Image Width="32" Height="22"
+                                       HorizontalAlignment="Center"
+                                       RenderOptions.BitmapScalingMode="HighQuality"
+                                       ToolTip="{Binding Releaser.Location}">
+                                    <Image.Source>
+                                        <Binding Path="Releaser.Country"
+                                                 Converter="{StaticResource CountryFlagConverter}"/>
+                                    </Image.Source>
+                                </Image>
+                                <TextBlock Text="{Binding Releaser.Location}"
+                                           FontSize="10" HorizontalAlignment="Center"
+                                           Foreground="{DynamicResource TextMuted}"
+                                           Margin="0,2,0,0"
+                                           Visibility="{Binding Releaser.Location,
+                                               Converter={StaticResource NullToVisibility}}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Releaser.DisplayName}"
+                                               FontSize="20" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimary}"/>
+                                    <TextBlock FontSize="14" VerticalAlignment="Bottom"
+                                               Margin="8,0,0,2"
+                                               Foreground="{DynamicResource TextMuted}"
+                                               Visibility="{Binding Releaser.RealName,
+                                                   Converter={StaticResource NullToVisibility}}">
+                                        <Run Text="("/>
+                                        <Run Text="{Binding Releaser.RealName, Mode=OneWay}"/>
+                                        <Run Text=")"/>
+                                    </TextBlock>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </DockPanel>
+
+                        <WrapPanel Margin="0,6,0,0">
+                            <Border CornerRadius="3" Padding="7,2" Margin="0,0,6,0"
+                                    Background="{DynamicResource Accent}">
+                                <TextBlock FontSize="11" Foreground="White" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="Groupe"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsGroup}" Value="False">
+                                                    <Setter Property="Text" Value="Scener"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+                            <Border CornerRadius="3" Padding="7,2" Margin="0,0,6,0"
+                                    Background="{DynamicResource BgHover}"
+                                    Visibility="{Binding Releaser.Abbreviation,
+                                        Converter={StaticResource NullToVisibility}}">
+                                <TextBlock Text="{Binding Releaser.Abbreviation}"
+                                           FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
+                            </Border>
+                            <Border CornerRadius="3" Padding="7,2"
+                                    Background="{DynamicResource BgHover}">
+                                <TextBlock FontSize="11" Foreground="{DynamicResource TextMuted}">
+                                    <Run Text="{Binding TotalReleaseCount, Mode=OneWay}"/>
+                                    <Run Text="{DynamicResource Count_Releases}"/>
+                                    <Run Text="{Binding PlatformGroups.Count, Mode=OneWay}"/>
+                                    <Run Text="{DynamicResource Count_Platforms}"/>
+                                </TextBlock>
+                            </Border>
+                        </WrapPanel>
+
+                        <Button Style="{StaticResource LinkButton}"
+                                Content="{Binding Releaser.Website}"
+                                FontSize="11" Margin="0,5,0,0"
+                                Click="BtnWebsite_Click"
+                                Visibility="{Binding Releaser.Website,
+                                    Converter={StaticResource NullToVisibility}}"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- ── Corps : 2 colonnes ─────────────────────────────────── -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>
+                    <ColumnDefinition Width="260"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ─ Colonne gauche : releases groupées par plateforme ── -->
+                <Grid Grid.Column="0" x:Name="LeftColGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Barre de tri + filtre -->
+                    <Border Grid.Row="0" Padding="16,8"
+                            Background="{DynamicResource BgPanel}"
+                            BorderBrush="{DynamicResource Border}"
+                            BorderThickness="0,0,0,1">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="{DynamicResource RD_SortPrefix}" FontSize="11"
+                                           Foreground="{DynamicResource TextMuted}"
+                                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <ToggleButton Style="{StaticResource FilterChip}"
+                                                  Content="{DynamicResource RL_SortAZ}"
+                                                  Padding="8,3" Margin="0,0,4,0"
+                                                  IsChecked="{Binding SortByAlpha, Mode=OneWay}"
+                                                  Command="{Binding SetSortCommand}"
+                                                  CommandParameter="alpha"/>
+                                    <ToggleButton Style="{StaticResource FilterChip}"
+                                                  Content="{DynamicResource RL_SortDate}"
+                                                  Padding="8,3"
+                                                  IsChecked="{Binding SortByDate, Mode=OneWay}"
+                                                  Command="{Binding SetSortCommand}"
+                                                  CommandParameter="date"/>
+                                </StackPanel>
+                            </DockPanel>
+                            <!-- Filtre par Supertype — même mécanique/style que ReleaseListView -->
+                            <WrapPanel Margin="0,8,0,0">
+                                <ToggleButton Style="{StaticResource FilterChip}" Content="{DynamicResource RL_All}"
+                                              Margin="0,0,4,4"
+                                              IsChecked="{Binding IsAllSelected, Mode=OneWay}"
+                                              Command="{Binding FilterBySupertypeCommand}"
+                                              CommandParameter="{x:Null}"/>
+                                <ToggleButton Style="{StaticResource FilterChip}" Content="{DynamicResource RL_Demos}"
+                                              Margin="0,0,4,4"
+                                              IsChecked="{Binding IsProductionSelected, Mode=OneWay}"
+                                              Command="{Binding FilterBySupertypeCommand}"
+                                              CommandParameter="production"/>
+                                <ToggleButton Style="{StaticResource FilterChip}" Content="{DynamicResource RL_Graphics}"
+                                              Margin="0,0,4,4"
+                                              IsChecked="{Binding IsGraphicsSelected, Mode=OneWay}"
+                                              Command="{Binding FilterBySupertypeCommand}"
+                                              CommandParameter="graphics"/>
+                                <ToggleButton Style="{StaticResource FilterChip}" Content="{DynamicResource RL_Music}"
+                                              Margin="0,0,4,4"
+                                              IsChecked="{Binding IsMusicSelected, Mode=OneWay}"
+                                              Command="{Binding FilterBySupertypeCommand}"
+                                              CommandParameter="music"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+
+                    <!-- Chargement releases -->
+                    <Border Grid.Row="1" Padding="20,10"
+                            Visibility="{Binding IsLoadingReleases,
+                                Converter={StaticResource BoolToVisibility}}">
+                        <ProgressBar IsIndeterminate="True" Width="100" Height="3"
+                                     HorizontalAlignment="Left"
+                                     Foreground="{DynamicResource Accent}"
+                                     Background="{DynamicResource BgHover}"
+                                     BorderThickness="0"/>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="2" x:Name="ReleasesScroller"
+                                  Style="{StaticResource SlimScrollViewer}"
+                                  VerticalScrollBarVisibility="Visible"
+                                  CanContentScroll="False"
+                                  VerticalAlignment="Stretch">
+                        <StackPanel Margin="0,8,0,16">
+                            <!-- Notes Markdown -->
+        <Border Margin="20,0,20,16"
+                Visibility="{Binding Notes, Converter={StaticResource NullToVisibility}}">
+            <Border Background="{DynamicResource BgCard}"
+                    BorderBrush="{DynamicResource Border}" BorderThickness="1"
+                    CornerRadius="{StaticResource RadiusLg}" Padding="12">
+                <ctrl:MarkdownViewer Markdown="{Binding Notes}"/>
+            </Border>
+        </Border>
+
+        <ItemsControl ItemsSource="{Binding PlatformGroups}"
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <!-- Bloc plateforme -->
+                                        <StackPanel Margin="0,0,0,4">
+
+                                            <!-- En-tête plateforme cliquable -->
+                                            <Border x:Name="PlatformHeader"
+                                                    Padding="16,10"
+                                                    Background="{DynamicResource BgCard}"
+                                                    BorderBrush="{DynamicResource Accent}"
+                                                    BorderThickness="3,0,0,0"
+                                                    Cursor="Hand"
+                                                    Margin="0,10,0,0">
+                                                <Border.InputBindings>
+                                                    <MouseBinding MouseAction="LeftClick"
+                                                        Command="{Binding ToggleExpandedCommand}"/>
+                                                </Border.InputBindings>
+                                                <DockPanel>
+                                                    <!-- Flèche + compteur à droite -->
+                                                    <StackPanel DockPanel.Dock="Right"
+                                                                Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                        <Border CornerRadius="10" Padding="8,2"
+                                                                Background="{DynamicResource BgHover}"
+                                                                Margin="0,0,10,0">
+                                                            <TextBlock FontSize="11"
+                                                                       Foreground="{DynamicResource TextSecondary}"
+                                                                       FontWeight="SemiBold">
+                                                                <Run Text="{Binding Count, Mode=OneWay}"/>
+                                                            </TextBlock>
+                                                        </Border>
+                                                        <TextBlock FontSize="12"
+                                                                   Foreground="{DynamicResource TextMuted}"
+                                                                   VerticalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Text" Value="▲"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+                                                                            <Setter Property="Text" Value="▼"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </StackPanel>
+
+                                                    <!-- Nom plateforme -->
+                                                    <TextBlock Text="{Binding PlatformName}"
+                                                               FontSize="15" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource TextPrimary}"
+                                                               VerticalAlignment="Center"/>
+                                                </DockPanel>
+                                            </Border>
+
+                                            <!-- Liste des releases -->
+                                            <StackPanel Visibility="{Binding IsExpanded,
+                                                            Converter={StaticResource BoolToVisibility}}">
+                                                <ItemsControl ItemsSource="{Binding Releases}"
+                                                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                              VirtualizingStackPanel.IsVirtualizing="True">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <VirtualizingStackPanel/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border x:Name="ItemBd"
+                                                                    Padding="20,9"
+                                                                    Background="Transparent"
+                                                                    BorderBrush="{DynamicResource Border}"
+                                                                    BorderThickness="0,0,0,1"
+                                                                    Cursor="Hand">
+                                                                <Border.InputBindings>
+                                                                    <MouseBinding MouseAction="LeftClick"
+                                                                        Command="{Binding DataContext.OpenReleaseCommand,
+                                                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                        CommandParameter="{Binding}"/>
+                                                                </Border.InputBindings>
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <StackPanel Grid.Column="0">
+                                                                        <DockPanel>
+                                                                            <!-- Icône type de release -->
+                                                                            <TextBlock
+                                                                                FontSize="13"
+                                                                                Margin="0,0,6,0"
+                                                                                VerticalAlignment="Center"
+                                                                                DockPanel.Dock="Left">
+                                                                                <TextBlock.Style>
+                                                                                    <Style TargetType="TextBlock">
+                                                                                        <Setter Property="Text"
+                                                                                                Value="{Binding ReleaseTypeName,
+                                                                                                    Converter={StaticResource ReleaseTypeIcon}}"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding ReleaseTypeName}" Value="">
+                                                                                                <Setter Property="Text"
+                                                                                                        Value="{Binding Supertype,
+                                                                                                            Converter={StaticResource ReleaseTypeIcon}}"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </TextBlock.Style>
+                                                                            </TextBlock>
+                                                                            <TextBlock Text="{Binding Title}"
+                                                                                       FontSize="13" FontWeight="SemiBold"
+                                                                                       TextTrimming="CharacterEllipsis">
+                                                                                <TextBlock.Style>
+                                                                                    <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+                                                                                        <Style.Triggers>
+                                                                                            <!-- Titre atténué : aucun fichier exploitable pour cette
+                                                                                                 release (cf. badge 🚫 colonne droite), même logique que
+                                                                                                 ReleaseListView. -->
+                                                                                            <DataTrigger Binding="{Binding HasNoFile}" Value="True">
+                                                                                                <Setter Property="Foreground" Value="{DynamicResource TextMuted}"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </TextBlock.Style>
+                                                                            </TextBlock>
+                                                                            <!-- Rôle tenu par le releaser de cette fiche sur cette
+                                                                                 release précise (ex. "(Music)") — vient de
+                                                                                 ReleaseCredits.Role, absent si la personne n'est
+                                                                                 qu'auteur principal sans crédit détaillé. -->
+                                                                            <TextBlock Text="{Binding CreditedRole, StringFormat=' ({0})'}"
+                                                                                       FontSize="13"
+                                                                                       Foreground="{DynamicResource TextMuted}"
+                                                                                       Visibility="{Binding CreditedRole,
+                                                                                           Converter={StaticResource NullToVisibility}}"/>
+                                                                        </DockPanel>
+                                                                        <WrapPanel Margin="0,3,0,0">
+                                                                            <Border CornerRadius="3" Padding="5,1"
+                                                                                    Background="{DynamicResource BgHover}"
+                                                                                    Margin="0,0,6,0"
+                                                                                    Visibility="{Binding ReleaseTypeName,
+                                                                                        Converter={StaticResource NullToVisibility}}">
+                                                                                <TextBlock Text="{Binding ReleaseTypeName}"
+                                                                                           FontSize="10"
+                                                                                           Foreground="{DynamicResource TextSecondary}"/>
+                                                                            </Border>
+                                                                            <TextBlock Text="{Binding AuthorNames}"
+                                                                                       FontSize="11"
+                                                                                       Foreground="{DynamicResource TextAccent}"
+                                                                                       TextTrimming="CharacterEllipsis"/>
+                                                                        </WrapPanel>
+                                                                    </StackPanel>
+                                                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                                                        <!-- Aucun fichier exploitable — même badge que ReleaseListView. -->
+                                                                        <TextBlock Text="🚫"
+                                                                                   FontSize="11"
+                                                                                   Foreground="{DynamicResource Red}"
+                                                                                   HorizontalAlignment="Right"
+                                                                                   Margin="0,0,0,2"
+                                                                                   ToolTip="Aucun fichier disponible pour cette release (référence vidéo uniquement, le cas échéant)"
+                                                                                   Visibility="{Binding HasNoFile,
+                                                                                       Converter={StaticResource BoolToVisibility}}"/>
+                                                                        <TextBlock Text="{Binding ReleaseDate}"
+                                                                                   FontSize="11"
+                                                                                   Foreground="{DynamicResource TextMuted}"
+                                                                                   HorizontalAlignment="Right"/>
+                                                                        <TextBlock Text="{Binding BestRank,
+                                                                                       Converter={StaticResource RankToString}}"
+                                                                                   FontSize="11" FontWeight="SemiBold"
+                                                                                   Foreground="{DynamicResource Gold}"
+                                                                                   HorizontalAlignment="Right"
+                                                                                   Margin="0,2,0,0"
+                                                                                   ToolTip="{Binding BestCompetition}"
+                                                                                   Visibility="{Binding BestRank,
+                                                                                       Converter={StaticResource NullToVisibility}}"/>
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
+                                                            <DataTemplate.Triggers>
+                                                                <DataTrigger Value="True">
+                                                                    <DataTrigger.Binding>
+                                                                        <MultiBinding Converter="{StaticResource ReferenceEquality}">
+                                                                            <Binding Path="."/>
+                                                                            <Binding Path="DataContext.SelectedRelease"
+                                                                                     RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                        </MultiBinding>
+                                                                    </DataTrigger.Binding>
+                                                                    <Setter TargetName="ItemBd" Property="Background"
+                                                                            Value="{DynamicResource BgSelected}"/>
+                                                                    <Setter TargetName="ItemBd" Property="BorderBrush"
+                                                                            Value="{DynamicResource Accent}"/>
+                                                                    <Setter TargetName="ItemBd" Property="BorderThickness"
+                                                                            Value="2,0,0,0"/>
+                                                                </DataTrigger>
+                                                                <Trigger SourceName="ItemBd" Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="ItemBd" Property="Background"
+                                                                            Value="{DynamicResource BgHover}"/>
+                                                                </Trigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+
+                <Border Grid.Column="1" Background="{DynamicResource Border}"/>
+
+                <!-- ─ Colonne droite : nicks + membres/groupes ─────────── -->
+                <ScrollViewer Grid.Column="2" x:Name="RightScroller"
+                              Style="{StaticResource SlimScrollViewer}"
+                              Padding="0,0,0,16"
+                              VerticalScrollBarVisibility="Visible"
+                              VerticalAlignment="Stretch">
+                    <StackPanel>
+                        <!-- Nicks -->
+                        <Border Padding="16,12,16,8"
+                                BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+                            <StackPanel>
+                                <TextBlock Text="{DynamicResource Rel_Nicks}" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextMuted}" Margin="0,0,0,8"/>
+                                <ItemsControl ItemsSource="{Binding Releaser.Nicks}"
+                                ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       Margin="0,0,0,4"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Membres (si groupe) -->
+                        <StackPanel Visibility="{Binding IsGroup,
+                                        Converter={StaticResource BoolToVisibility}}">
+                            <Border Padding="16,12,16,4"
+                                    BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+                                <TextBlock FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextMuted}">
+                                    <Run Text="{DynamicResource Rel_Members}"/>
+                                    <Run Text="{Binding Members.Count, Mode=OneWay}"/>
+                                    <Run Text=")"/>
+                                </TextBlock>
+                            </Border>
+                            <ItemsControl ItemsSource="{Binding Members}"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="MemberBd" Padding="16,8"
+                                                Background="Transparent" Cursor="Hand"
+                                                BorderBrush="{DynamicResource Border}"
+                                                BorderThickness="0,0,0,1">
+                                            <Border.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick"
+                                                    Command="{Binding DataContext.OpenMemberCommand,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            </Border.InputBindings>
+                                            <TextBlock Text="{Binding Name}" FontSize="12"
+                                                       Foreground="{DynamicResource TextLink}"/>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <Trigger SourceName="MemberBd" Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="MemberBd" Property="Background"
+                                                        Value="{DynamicResource BgHover}"/>
+                                            </Trigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <!-- Groupes d'appartenance (si scener) -->
+                        <StackPanel Visibility="{Binding IsScener,
+                                        Converter={StaticResource BoolToVisibility}}">
+                            <Border Padding="16,12,16,4"
+                                    BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+                                <TextBlock FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextMuted}">
+                                    <Run Text="{DynamicResource List_Groups}"/>
+                                    <Run Text="{Binding Groups.Count, Mode=OneWay}"/>
+                                    <Run Text=")"/>
+                                </TextBlock>
+                            </Border>
+                            <ItemsControl ItemsSource="{Binding Groups}"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="GroupBd" Padding="16,8"
+                                                Background="Transparent" Cursor="Hand"
+                                                BorderBrush="{DynamicResource Border}"
+                                                BorderThickness="0,0,0,1">
+                                            <Border.InputBindings>
+                                                <MouseBinding MouseAction="LeftClick"
+                                                    Command="{Binding DataContext.OpenMemberCommand,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            </Border.InputBindings>
+                                            <TextBlock Text="{Binding Name}" FontSize="12"
+                                                       Foreground="{DynamicResource TextLink}"/>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <Trigger SourceName="GroupBd" Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="GroupBd" Property="Background"
+                                                        Value="{DynamicResource BgHover}"/>
+                                            </Trigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,319 @@
+<UserControl x:Class="DemoBase.App.Views.FavoriteSoundtracksView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource BgApp}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Header -->
+            <RowDefinition Height="*"/>     <!-- Player occupe tout -->
+        </Grid.RowDefinitions>
+
+        <!-- ── Header ─────────────────────────────────────────────────────── -->
+        <Border Grid.Row="0" Padding="20,14"
+                BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1"
+                Background="{DynamicResource BgCard}">
+            <DockPanel>
+                <!-- 2026-07-30, retour utilisateur : le bouton "Tout jouer" ne lançait
+                     QUE les favoris non classés (PlayAllCommand → Soundtracks), pas
+                     toute la bibliothèque — sa place dans le header général de la page
+                     était trompeuse (à côté de "Lire toutes les playlists", qui lui
+                     joue vraiment tout). Déplacé dans la colonne "MES FAVORIS (non
+                     classés)", au même niveau que ce à quoi il s'applique réellement,
+                     même schéma que "Lire toutes les playlists" dans la colonne
+                     Playlists. -->
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource Nav_FavSoundtracks}" FontSize="16" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}"/>
+                    <TextBlock FontSize="11" Foreground="{DynamicResource TextMuted}"
+                               Visibility="{Binding IsBuildingRelease, Converter={StaticResource InverseBoolToVisibility}}">
+                        <Run Text="{Binding Soundtracks.Count, Mode=OneWay}"/>
+                        <Run Text="{DynamicResource Count_Soundtracks}"/>
+                    </TextBlock>
+                    <!-- Statut de téléchargement à la demande (ZIP pas encore en cache
+                         local pour une piste de la playlist lancée). -->
+                    <TextBlock Text="{Binding BuildStatusMessage}" FontSize="11"
+                               Foreground="{DynamicResource Accent}"
+                               Visibility="{Binding IsBuildingRelease, Converter={StaticResource BoolToVisibility}}"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ── Contenu : Playlists | Favoris non classés | Player/Tracker ──── -->
+        <!-- La page occupe toute la largeur de la fenêtre (colonne "fiche Release"
+             masquée par MainWindow pour cette vue, cf. isFavSoundtracks dans
+             MainWindow.xaml.cs). Répartition 25% / 25% / 50% : playlists, pistes
+             favorites pas encore rangées dans une playlist, puis le lecteur. -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" MinWidth="260"/>
+                <ColumnDefinition Width="1"/>
+                <ColumnDefinition Width="1*" MinWidth="260"/>
+                <ColumnDefinition Width="1"/>
+                <ColumnDefinition Width="2*" MinWidth="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ══════════════════════════ Colonne 1 : Playlists ═══════════════ -->
+            <ScrollViewer Grid.Column="0"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="16,12">
+
+                    <DockPanel Margin="0,0,0,8">
+                        <TextBlock DockPanel.Dock="Left" Text="{DynamicResource PL_Playlists}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   VerticalAlignment="Center"/>
+                        <Button DockPanel.Dock="Right" Content="{DynamicResource PL_New}"
+                                Style="{StaticResource IconButton}" FontSize="11"
+                                Padding="8,4"
+                                Command="{Binding CreatePlaylistCommand}"/>
+                    </DockPanel>
+
+                    <Button Content="{DynamicResource PL_PlayAll}"
+                            Style="{StaticResource AccentButton}" FontSize="11"
+                            Padding="10,6" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                            Command="{Binding PlayAllPlaylistsCommand}"
+                            IsEnabled="{Binding HasPlaylists}"/>
+
+                    <!-- Astuce : sélectionner une playlist en fait la cible du "➕"
+                         sur les favoris non classés (colonne 2) — ajout direct sans
+                         menu de choix. -->
+                    <TextBlock Text="{DynamicResource PL_SelectHint}" FontSize="10"
+                               Foreground="{DynamicResource TextMuted}"
+                               TextWrapping="Wrap" Margin="0,0,0,10"
+                               Visibility="{Binding HasPlaylists, Converter={StaticResource BoolToVisibility}}"/>
+
+                    <ItemsControl ItemsSource="{Binding Playlists}" Margin="0,0,0,8">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="10,6" Margin="0,0,0,6"
+                                        CornerRadius="{StaticResource RadiusMd}"
+                                        BorderThickness="1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="{DynamicResource BgCard}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource Border}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource AccentSubtle}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel>
+                                        <!-- En-tête playlist -->
+                                        <DockPanel>
+                                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                                <Button Content="▶" Width="26" Height="26" Padding="0"
+                                                        Style="{StaticResource IconButton}" FontSize="11"
+                                                        Margin="0,0,4,0"
+                                                        ToolTip="Lire cette playlist"
+                                                        Command="{Binding DataContext.PlayPlaylistCommand,
+                                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"/>
+                                                <Button Content="✎" Width="26" Height="26" Padding="0"
+                                                        Style="{StaticResource IconButton}" FontSize="12"
+                                                        Margin="0,0,4,0"
+                                                        ToolTip="{DynamicResource PL_Rename}"
+                                                        Command="{Binding DataContext.RenamePlaylistCommand,
+                                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"/>
+                                                <Button Content="🗑" Width="26" Height="26" Padding="0"
+                                                        Style="{StaticResource IconButton}" FontSize="12"
+                                                        ToolTip="{DynamicResource PL_Delete}"
+                                                        Command="{Binding DataContext.DeletePlaylistCommand,
+                                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"/>
+                                            </StackPanel>
+                                            <!-- Border (pas Button) : le template IconButton force son
+                                                 ContentPresenter à HorizontalAlignment="Center" quel que
+                                                 soit HorizontalContentAlignment — impossible d'y aligner
+                                                 le texte à gauche. Cliquable via MouseLeftButtonUp,
+                                                 même pattern que TitleTextBlock (piste favorite). -->
+                                            <Border DockPanel.Dock="Left"
+                                                    Background="Transparent"
+                                                    Cursor="Hand" Padding="4,2"
+                                                    MouseLeftButtonUp="PlaylistHeader_MouseLeftButtonUp"
+                                                    Tag="{Binding}">
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                                    <TextBlock FontSize="10" Margin="0,0,6,0"
+                                                               Foreground="{DynamicResource TextMuted}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text" Value="▶"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                        <Setter Property="Text" Value="▼"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource TextPrimary}"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding TrackCount, StringFormat=' ({0})'}"
+                                                               FontSize="11" Foreground="{DynamicResource TextMuted}"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DockPanel>
+
+                                        <!-- Pistes (visibles seulement si la playlist est sélectionnée) -->
+                                        <ItemsControl ItemsSource="{Binding Tracks}" Margin="20,4,0,0"
+                                                      Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <DockPanel Margin="0,2">
+                                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                                            <Button Content="▲" Width="20" Height="20" Padding="0"
+                                                                    FontSize="8" Style="{StaticResource IconButton}"
+                                                                    Click="PlaylistTrackUp_Click"/>
+                                                            <Button Content="▼" Width="20" Height="20" Padding="0"
+                                                                    FontSize="8" Style="{StaticResource IconButton}"
+                                                                    Click="PlaylistTrackDown_Click"/>
+                                                            <Button Content="✕" Width="20" Height="20" Padding="0"
+                                                                    FontSize="9" Style="{StaticResource IconButton}"
+                                                                    Click="PlaylistTrackRemove_Click"/>
+                                                        </StackPanel>
+                                                        <TextBlock Text="{Binding Title}" FontSize="11"
+                                                                   Foreground="{DynamicResource TextSecondary}"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                    </DockPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{DynamicResource PL_NoPlaylist}"
+                               FontSize="11" Foreground="{DynamicResource TextMuted}"
+                               TextWrapping="Wrap" Margin="0,0,0,10"
+                               Visibility="{Binding HasPlaylists,
+                                   Converter={StaticResource InverseBoolToVisibility}}"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Séparateur vertical -->
+            <Border Grid.Column="1" Background="{DynamicResource Border}"/>
+
+            <!-- ══════════════════ Colonne 2 : Favoris non classés ═════════════ -->
+            <ScrollViewer Grid.Column="2"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="16,12">
+
+                    <TextBlock Text="{DynamicResource PL_MyFavorites}"
+                               FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextMuted}"
+                               Margin="0,0,0,8"/>
+
+                    <!-- 2026-07-30, retour utilisateur : déplacé depuis le header
+                         général de la page — ce bouton ne lance que CES pistes
+                         (favoris non classés), pas toute la bibliothèque. Même
+                         emplacement/style que "Lire toutes les playlists" dans la
+                         colonne Playlists (juste sous son propre en-tête). -->
+                    <Button Content="{DynamicResource RD_PlayAll}"
+                            Style="{StaticResource AccentButton}" FontSize="11"
+                            Padding="10,6" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                            Command="{Binding PlayAllCommand}"
+                            IsEnabled="{Binding HasTracks}"/>
+
+                    <ItemsControl ItemsSource="{Binding Soundtracks}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource BgCard}"
+                                        BorderBrush="{DynamicResource Border}"
+                                        BorderThickness="1"
+                                        CornerRadius="{StaticResource RadiusMd}"
+                                        Padding="12,8" Margin="0,0,0,6">
+                                    <DockPanel>
+                                        <!-- Boutons -->
+                                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                            <Button Content="▶" Width="32" Height="32"
+                                                    Style="{StaticResource AccentButton}"
+                                                    Margin="0,0,6,0"
+                                                    Command="{Binding DataContext.PlayTrackCommand,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            <Button Content="➕" Width="32" Height="32"
+                                                    Style="{StaticResource IconButton}"
+                                                    ToolTip="{DynamicResource PL_AddToPlaylist}"
+                                                    Margin="0,0,6,0"
+                                                    Click="AddToPlaylist_Click"
+                                                    Tag="{Binding}"/>
+                                            <Button Content="🗑" Width="32" Height="32"
+                                                    Style="{StaticResource IconButton}"
+                                                    ToolTip="Retirer des favoris"
+                                                    Command="{Binding DataContext.RemoveTrackCommand,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                        <!-- Infos -->
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}"
+                                                       FontSize="13" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource TextPrimary}"
+                                                       Cursor="Hand"
+                                                       ToolTip="Ouvrir la release"
+                                                       MouseLeftButtonUp="TitleTextBlock_MouseLeftButtonUp"
+                                                       Tag="{Binding}"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                <TextBlock Text="{Binding AuthorNames}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource TextSecondary}"
+                                                           Visibility="{Binding AuthorNames,
+                                                               Converter={StaticResource NullToVisibility}}"/>
+                                                <TextBlock Text=" — " FontSize="11"
+                                                           Foreground="{DynamicResource TextMuted}"
+                                                           Visibility="{Binding ReleaseTitle,
+                                                               Converter={StaticResource NullToVisibility}}"/>
+                                                <TextBlock Text="{Binding ReleaseTitle}"
+                                                           FontSize="11" FontStyle="Italic"
+                                                           Foreground="{DynamicResource TextMuted}"
+                                                           Visibility="{Binding ReleaseTitle,
+                                                               Converter={StaticResource NullToVisibility}}"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding RomName}"
+                                                       FontSize="10" FontFamily="Consolas"
+                                                       Foreground="{DynamicResource Accent}"
+                                                       Margin="0,1,0,0"
+                                                       Visibility="{Binding RomName,
+                                                           Converter={StaticResource NullToVisibility}}"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Vide -->
+                    <TextBlock Text="{DynamicResource RD_NoFavSoundtrack}"
+                               FontSize="12" Foreground="{DynamicResource TextMuted}"
+                               Margin="0,8,0,0"
+                               Visibility="{Binding HasTracks,
+                                   Converter={StaticResource InverseBoolToVisibility}}"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Séparateur vertical -->
+            <Border Grid.Column="3" Background="{DynamicResource Border}"/>
+
+            <!-- ══════════════════════ Colonne 3 : Tracker/Player ══════════════ -->
+            <!-- Transport + vue pattern/oscilloscope — message d'attente tant
+                 qu'aucune piste n'a encore été lancée. -->
+            <Grid Grid.Column="4">
+                <ContentControl Content="{Binding Player}"
+                                Visibility="{Binding Player, Converter={StaticResource NullToVisibility}}"/>
+                <TextBlock Text="{DynamicResource RD_ClickPlay}"
+                           FontSize="13" Foreground="{DynamicResource TextMuted}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Visibility="{Binding Player, Converter={StaticResource InverseNullToVisibility}}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

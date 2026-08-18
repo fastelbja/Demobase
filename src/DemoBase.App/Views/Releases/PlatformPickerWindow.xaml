@@ -1,0 +1,68 @@
+<Window x:Class="DemoBase.App.Views.Releases.PlatformPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource PPick_Title}"
+        Width="460" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{DynamicResource BgApp}">
+
+    <!-- 2026-07-25 : fenêtre de choix de plateforme/profil affichée au clic sur
+         "Lancer" quand une release est multi-plateforme (ex. Amiga AGA + Atari
+         Falcon) ET que le fichier actuellement sélectionné n'a pas encore de
+         profil enregistré — cf. PlatformPickerWindow.xaml.cs et
+         ReleaseDetailViewModel.ResolveOrPromptEmulatorConfigIdAsync. Le choix est
+         mémorisé (override par fichier ou par release) pour ne plus jamais être
+         redemandé pour le même fichier. -->
+    <StackPanel Margin="24">
+
+        <TextBlock Text="{DynamicResource PPick_Heading}"
+                   FontSize="15" FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextPrimary}"
+                   TextWrapping="Wrap"/>
+
+        <Border Background="{DynamicResource BgCard}"
+                BorderBrush="{DynamicResource Border}" BorderThickness="1"
+                CornerRadius="{StaticResource RadiusMd}"
+                Padding="10,7" Margin="0,10,0,0"
+                Visibility="{Binding HasFileLabel, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock FontSize="12" Foreground="{DynamicResource TextSecondary}"
+                       TextTrimming="CharacterEllipsis">
+                <Run Text="{DynamicResource PPick_FilePrefix}" Foreground="{DynamicResource TextMuted}"/>
+                <Run Text="{Binding FileLabel, Mode=OneWay}" FontFamily="{StaticResource FontMono}"/>
+            </TextBlock>
+        </Border>
+
+        <TextBlock Text="{DynamicResource PPick_Body}"
+                   FontSize="12" Foreground="{DynamicResource TextMuted}"
+                   TextWrapping="Wrap" Margin="0,10,0,14"/>
+
+        <ComboBox ItemsSource="{Binding Profiles}"
+                  SelectedItem="{Binding SelectedProfile}"
+                  Style="{StaticResource FlatComboBox}"
+                  FontSize="12" Padding="8,6">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock FontSize="12">
+                        <Run Text="{Binding Emulator.Name, Mode=OneWay}"/>
+                        <Run Text=" — "/>
+                        <Run Text="{Binding ProfileName, Mode=OneWay}"/>
+                        <Run Text=" ("/>
+                        <Run Text="{Binding Platform.Name, Mode=OneWay}"/>
+                        <Run Text=")"/>
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="{DynamicResource Dlg_Cancel}" FontSize="12" Padding="14,7" Margin="0,0,8,0"
+                    Style="{StaticResource IconButton}"
+                    Click="Cancel_Click"/>
+            <Button Content="{DynamicResource Dlg_Launch}" FontSize="12" Padding="18,7"
+                    Style="{StaticResource AccentButton}"
+                    Click="Launch_Click"/>
+        </StackPanel>
+
+    </StackPanel>
+</Window>
