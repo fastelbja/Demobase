@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <NoWarn>CS1591;CS1570;CS0169;CS1998</NoWarn>
+    <LangVersion>12</LangVersion>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <AssemblyName>TrackerPlayer.Core</AssemblyName>
+    <RootNamespace>TrackerPlayer.Core</RootNamespace>
+    <Description>Core library for playing classic tracker music formats (MOD, S3M, XM, IT, and exotic formats via UADE/ZXTune)</Description>
+    <Authors>TrackerPlayer</Authors>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- NAudio pour la sortie audio Windows -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <!-- NAudio.Vorbis pour le support OGG Vorbis (WMF ne le supporte pas nativement) -->
+    <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+    <!-- Pour les logs -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <!-- 2026-08-06 : cache SQLite des durées UADE (UadeDurationDatabase.cs) —
+         même version que DemoBase.Import, qui l'utilise déjà ailleurs dans la solution. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>
