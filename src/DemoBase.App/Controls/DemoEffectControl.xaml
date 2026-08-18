@@ -1,0 +1,15 @@
+<UserControl x:Class="DemoBase.App.Controls.DemoEffectControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ClipToBounds="True">
+    <Grid>
+        <Image x:Name="EffectImage"
+               Stretch="UniformToFill"
+               RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+        <TextBlock x:Name="EffectLabel"
+                   VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                   Margin="4,0,0,3"
+                   FontFamily="Courier New" FontSize="9"
+                   Foreground="#88FFFFFF"/>
+    </Grid>
+</UserControl>

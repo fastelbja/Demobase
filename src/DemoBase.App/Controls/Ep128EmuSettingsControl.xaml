@@ -1,0 +1,49 @@
+<UserControl x:Class="DemoBase.App.Views.Emulators.Ep128EmuSettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DemoBase.App.ViewModels.Emulators">
+    <Border Background="{DynamicResource BgCard}"
+            BorderBrush="{DynamicResource Border}" BorderThickness="1"
+            CornerRadius="{StaticResource RadiusLg}"
+            Padding="18,14" Margin="0,0,0,20">
+        <StackPanel>
+
+            <DockPanel Margin="0,0,0,14">
+                <TextBlock DockPanel.Dock="Right"
+                           Text="ep128emu" FontSize="10" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Accent}" VerticalAlignment="Center"/>
+                <TextBlock Text="Enterprise 64/128" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimary}"/>
+            </DockPanel>
+
+            <!-- Machine -->
+            <TextBlock Text="Machine émulée" Style="{StaticResource FieldLabel}" Margin="0,0,0,4"/>
+            <ComboBox Style="{StaticResource FlatComboBox}" Margin="0,0,0,12"
+                      ItemsSource="{x:Static vm:Ep128EmuSettingsViewModel.MachineOptions}"
+                      DisplayMemberPath="Key"
+                      SelectedValue="{Binding MachineType}"
+                      SelectedValuePath="Value"/>
+
+            <!-- Config de base -->
+            <TextBlock Text="Config de base (.ep128cfg) — optionnel" Style="{StaticResource FieldLabel}" Margin="0,0,0,4"/>
+            <TextBox Style="{StaticResource SearchBox}"
+                     Text="{Binding CfgFile, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,0,12" Padding="8,6"
+                     FontFamily="{StaticResource FontMono}" FontSize="11"
+                     ToolTip="Chemin vers un fichier de config .ep128cfg chargé avec -cfg avant le lancement"/>
+
+            <!-- Info -->
+            <Border Background="{DynamicResource BgSurface}" CornerRadius="4" Padding="10,8">
+                <StackPanel>
+                    <TextBlock FontSize="10" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextSecondary}"
+                               Text="Formats &amp; BIOS" Margin="0,0,0,4"/>
+                    <TextBlock FontSize="10" Foreground="{DynamicResource TextSecondary}"
+                               TextWrapping="Wrap"
+                               Text="ROMs Enterprise : .com .prg .trn .128 (sans extension aussi supporté). Snapshots : .ep128s .ep128d. Tape : .tap .tzx. Floppy : .img .dsk. Les ROMs BIOS (exos21.rom, basic21.rom…) sont installées par epmakecfg.exe au premier lancement de ep128emu."/>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </Border>
+</UserControl>
