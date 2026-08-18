@@ -1,0 +1,49 @@
+<Application x:Class="DemoBase.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:DemoBase.App.Converters"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Strings.fr.xaml"/>
+                <!-- Thème actif (dark par défaut — remplacé dynamiquement) -->
+                <ResourceDictionary x:Name="ActiveTheme"
+                                    Source="Themes/DarkTheme.xaml"/>
+                <!-- Styles globaux des contrôles -->
+                <ResourceDictionary Source="Themes/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Converters globaux -->
+            <conv:NullToVisibilityConverter          x:Key="NullToVisibility"/>
+            <conv:InverseNullToVisibilityConverter   x:Key="InverseNullToVisibility"/>
+            <conv:BoolToVisibilityConverter       x:Key="BoolToVisibility"/>
+            <conv:InverseBoolConverter            x:Key="InverseBool"/>
+            <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
+            <conv:RankToStringConverter           x:Key="RankToString"/>
+            <conv:ReleaseDateConverter            x:Key="ReleaseDate"/>
+            <conv:FavoriteToStarConverter         x:Key="FavoriteToStar"/>
+            <conv:EmptyCollectionToVisibilityConverter x:Key="EmptyToVisibility"/>
+            <conv:ThumbnailPathConverter          x:Key="ThumbnailPath"/>
+            <conv:FileExtToColorConverter         x:Key="FileExtToColor"/>
+            <conv:FileExtToLabelConverter         x:Key="FileExtToLabel"/>
+            <conv:IntEqualityConverter            x:Key="IntEquality"/>
+            <conv:InitialsConverter               x:Key="InitialsConverter"/>
+            <conv:CountryToFlagConverter          x:Key="CountryToFlag"/>
+            <conv:ReleaseTypeIconConverter        x:Key="ReleaseTypeIcon"/>
+            <conv:PlatformIconConverter              x:Key="PlatformIcon"/>
+            <conv:PlatformHasIconConverter           x:Key="PlatformHasIcon"/>
+            <conv:NullToWildConverter                x:Key="NullToWild"/>
+            <conv:RomPathToNameConverter             x:Key="RomPathToName"/>
+            <conv:DatEntryStatusToColorConverter     x:Key="DatEntryStatusToColor"/>
+            <conv:CountryFlagConverter               x:Key="CountryFlagConverter"/>
+            <conv:CountryNameConverter               x:Key="CountryNameConverter"/>
+            <conv:EqualityConverter                  x:Key="EqualityConverter"/>
+            <conv:ReferenceEqualityConverter         x:Key="ReferenceEquality"/>
+            <conv:RankToVisibilityConverter           x:Key="RankToVisibility"/>
+            <conv:FileSizeConverter                  x:Key="FileSizeConverter"/>
+            <conv:SecondsToTimeConverter             x:Key="SecondsToTime"/>
+            <conv:RomFoundToVisibilityConverter      x:Key="RomFoundToVisibility"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
