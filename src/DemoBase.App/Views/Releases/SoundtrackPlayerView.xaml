@@ -1,0 +1,370 @@
+<UserControl x:Class="DemoBase.App.Views.Releases.SoundtrackPlayerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:tp="clr-namespace:TrackerPlayer.UI.Controls;assembly=TrackerPlayer.UI"
+             Background="{DynamicResource BgCard}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Header : titre + contrôles -->
+            <RowDefinition Height="*"/>     <!-- Pattern / Oscilloscope -->
+        </Grid.RowDefinitions>
+
+        <!-- ── Header ──────────────────────────────────────────────────────── -->
+        <Border Grid.Row="0" Padding="10,8"
+                BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>  <!-- Boutons -->
+                    <ColumnDefinition Width="*"/>     <!-- Titre -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Volume + BPM -->
+                </Grid.ColumnDefinitions>
+
+                <!-- Contrôles lecture -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal"
+                            VerticalAlignment="Center" Margin="0,0,8,0">
+                    <!-- Précédent — masqué en mode MediaBrowser -->
+                    <Button Content="⏮" Width="32" Height="32" Padding="0" Margin="0,0,2,0"
+                            Style="{StaticResource IconButton}" FontSize="14"
+                            Command="{Binding PreviousCommand}"
+                            ToolTip="Précédent"
+                            Visibility="{Binding HideNavButtons, Converter={StaticResource InverseBoolToVisibility}}"/>
+                    <!-- Stop -->
+                    <Button Content="⏹" Width="32" Height="32" Padding="0" Margin="0,0,2,0"
+                            Style="{StaticResource IconButton}" FontSize="14"
+                            Command="{Binding StopCommand}"
+                            IsEnabled="{Binding IsLoaded}"/>
+                    <!-- Play/Pause -->
+                    <Button Width="32" Height="32" Padding="0" Margin="0,0,2,0"
+                            Style="{StaticResource IconButton}" FontSize="14"
+                            Command="{Binding PlayPauseCommand}"
+                            IsEnabled="{Binding IsLoaded}">
+                        <Button.Content>
+                            <TextBlock FontSize="14">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="▶"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                <Setter Property="Text" Value="⏸"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Button.Content>
+                    </Button>
+                    <!-- Suivant — masqué en mode MediaBrowser -->
+                    <Button Content="⏭" Width="32" Height="32" Padding="0" Margin="0,0,4,0"
+                            Style="{StaticResource IconButton}" FontSize="14"
+                            Command="{Binding NextCommand}"
+                            ToolTip="Suivant"
+                            Visibility="{Binding HideNavButtons, Converter={StaticResource InverseBoolToVisibility}}"/>
+                    <!-- Séparateur visuel -->
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                               Margin="4,6,4,6"/>
+                    <!-- Vue complète des patterns (full pattern view) -->
+                    <Button x:Name="BtnFullPattern"
+                            Content="⊞" Width="32" Height="32" Padding="0" Margin="0,0,4,0"
+                            Style="{StaticResource IconButton}" FontSize="16"
+                            ToolTip="Vue complète des patterns (tous les canaux)"
+                            Click="BtnFullPattern_Click"
+                            IsEnabled="{Binding HasPatterns}"/>
+                    <!-- 2026-07-31, retour utilisateur ("peux tu le mettre aussi sur la vue
+                         principale ?") : même panneau Infos (ordre + instruments) que dans
+                         Full Pattern View, aussi accessible ici — repliable, fermé par
+                         défaut, ne réduit donc pas l'espace du pattern viewer sauf demande
+                         explicite (clic sur ce bouton). -->
+                    <Button x:Name="BtnToggleInfo"
+                            Content="ℹ" Width="32" Height="32" Padding="0" Margin="0,0,4,0"
+                            Style="{StaticResource IconButton}" FontSize="14"
+                            ToolTip="Ordre / patterns / instruments"
+                            Click="BtnToggleInfo_Click"
+                            IsEnabled="{Binding HasPatterns}"/>
+                    <!-- Numéro dans la playlist -->
+                    <TextBlock Text="{Binding PlaylistDisplay}"
+                               FontSize="10" FontFamily="Consolas"
+                               Foreground="{DynamicResource TextMuted}"
+                               VerticalAlignment="Center" Margin="4,0,0,0"
+                               Visibility="{Binding HasPlaylist,
+                                   Converter={StaticResource BoolToVisibility}}"/>
+                </StackPanel>
+
+                <!-- Format + BPM + Volume -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal"
+                            VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding CurrentBpm}" FontSize="11"
+                               Foreground="{DynamicResource TextMuted}"
+                               FontFamily="Consolas" VerticalAlignment="Center"/>
+                    <TextBlock Text=" BPM  " FontSize="11"
+                               Foreground="{DynamicResource TextMuted}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding FormatDisplay}" FontSize="11"
+                               Foreground="{DynamicResource Accent}"
+                               FontFamily="Consolas" VerticalAlignment="Center"/>
+                    <!-- 2026-08-06, retour utilisateur ("peux tu rajouter une info pour que
+                         je sache quel lecteur joue le morceaux ?") : plusieurs formats
+                         "Amiga exotiques" sont couverts par UADE ET ZXTune, avec un repli de
+                         l'un vers l'autre en cas d'échec réel (cf. TrackerService.OpenAsync)
+                         — FormatDisplay seul ne dit donc plus quel MOTEUR joue vraiment.
+                         Entre crochets, discret, juste après le format. -->
+                    <TextBlock Text="{Binding EngineDisplay, StringFormat=' [{0}]'}" FontSize="11"
+                               Foreground="{DynamicResource TextMuted}"
+                               FontFamily="Consolas" VerticalAlignment="Center"
+                               Visibility="{Binding HasCurrentFileName,
+                                   Converter={StaticResource BoolToVisibility}}"/>
+                    <!-- 2026-07-31, retour utilisateur ("la pattern en cours de lecture, le
+                         nombre de patterns joués et la liste des patterns") : affichage
+                         compact "Pat X/Y" / "Ord X/Y" sur la même ligne que BPM/format —
+                         aucune ligne ni hauteur supplémentaire, donc aucune réduction de
+                         l'espace du pattern viewer ci-dessous. Liste complète des patterns
+                         (order list) + instruments : voir la fenêtre "Vue complète des
+                         patterns" (bouton ⊞), qui a la place pour un panneau détaillé. -->
+                    <TextBlock Text="{Binding PatternPositionDisplay}" FontSize="11"
+                               Foreground="{DynamicResource TextMuted}"
+                               FontFamily="Consolas" Margin="8,0,0,0"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding HasPatterns,
+                                   Converter={StaticResource BoolToVisibility}}"/>
+                    <TextBlock Text="{Binding OrderPositionDisplay}" FontSize="11"
+                               Foreground="{DynamicResource TextMuted}"
+                               FontFamily="Consolas" Margin="4,0,0,0"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding HasPatterns,
+                                   Converter={StaticResource BoolToVisibility}}"/>
+                    <Slider Width="80" Minimum="0" Maximum="1"
+                            Value="{Binding MasterVolume}" VerticalAlignment="Center"
+                            Margin="8,0,0,0" ToolTip="Volume"/>
+                    <!-- 2026-08-07, retour utilisateur ("peux tu faire de meme pour le
+                         'Panoramique' [...] et enleve le du player. Crée du coup une
+                         section 'UADE' dans les préférences pour mettre le panoramique et
+                         le replay gain.") : case à cocher + slider (UC_PANNING_VALUE)
+                         retirés d'ici, déplacés dans PreferencesView.xaml (section UADE),
+                         même principe que le gain UADE (cf. cette même section) — l'écran
+                         de lecture était déjà jugé "bien chargé" par l'utilisateur. -->
+                </StackPanel>
+
+                <!-- Titre + position -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <!-- 2026-07-31, retour utilisateur ("rajoute à cote du nom de la
+                         musique, entre parenthese, le type de module joué") : TitleDisplay
+                         combine Title + "(Format)" — cf. SoundtrackPlayerViewModel.cs.
+                         Ce header est commun à la vue pattern ET oscilloscope (Row 1
+                         ci-dessous), donc déjà visible dans les deux cas. -->
+                    <TextBlock Text="{Binding TitleDisplay}" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}"
+                               TextTrimming="CharacterEllipsis"/>
+                    <Grid ClipToBounds="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>  <!-- position / durée -->
+                            <ColumnDefinition Width="Auto"/>  <!-- séparateur -->
+                            <ColumnDefinition Width="*"/>     <!-- nom fichier -->
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" FontSize="10"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   FontFamily="Consolas">
+                            <Run Text="{Binding PositionDisplay, Mode=OneWay}"/><Run Text=" / "/><Run Text="{Binding DurationDisplay, Mode=OneWay}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Column="1" Text=" · " FontSize="10"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   Visibility="{Binding HasCurrentFileName,
+                                       Converter={StaticResource BoolToVisibility}}"/>
+                        <TextBlock Grid.Column="2" Text="{Binding CurrentFileName}" FontSize="10"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   FontFamily="Consolas"
+                                   TextTrimming="CharacterEllipsis"
+                                   Visibility="{Binding HasCurrentFileName,
+                                       Converter={StaticResource BoolToVisibility}}"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ── Pattern View ────────────────────────────────────────────────── -->
+        <Grid Grid.Row="1" MinHeight="120">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <!-- 2026-07-31 : panneau Infos repliable (cf. BtnToggleInfo ci-dessus),
+                     ouvert par défaut ("affiche le par défaut stp", retour utilisateur) —
+                     tous les enfants suivants n'ayant pas de Grid.Column explicite restent
+                     en colonne 0, donc aucun changement de mise en page pour eux. -->
+                <ColumnDefinition x:Name="MainInfoPanelColumn" Width="220"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Pattern (formats avec données de pattern) -->
+            <tp:PatternView x:Name="PatternViewControl"
+                            CurrentVm="{Binding CurrentPatternVm}"
+                            HighlightedRow="{Binding HighlightedRow}"
+                            TrackerStyle="{Binding TrackerStyle}"
+                            ChannelLevels="{Binding ChannelLevels}"
+                            Visibility="{Binding HasPatterns,
+                                Converter={StaticResource BoolToVisibility}}"/>
+
+
+            <!-- Oscilloscope (formats sans pattern : SID, YM, AY, TFMX…) + vue
+                 d'ensemble de la forme d'onde en bas (2026-08-07, demande
+                 utilisateur : "dans la vue oscilloscope, j'aimerais bien rajouter
+                 en bas une visualisation complète du .wav joué [...] pas
+                 necessaire pour les musiques executables, mais ok pour le
+                 reste"). Le binding de visibilité (HasPatterns inversé) est porté
+                 par ce Grid englobant — même comportement qu'avant ce correctif
+                 (bloc entier visible seulement en vue oscilloscope, jamais en vue
+                 pattern). WaveformOverviewControl.WaveformOverview est branché en
+                 code-behind (cf. SoundtrackPlayerView.xaml.cs, même mécanisme que
+                 OscilloscopeView.SampleBuffer) — reste à null (ligne plate) pour
+                 les musiques exécutables, aucune propriété WaveformOverview
+                 n'étant exposée pour ce format côté ViewModel. -->
+            <Grid Visibility="{Binding HasPatterns,
+                      Converter={StaticResource InverseBoolToVisibility}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+                <tp:OscilloscopeView x:Name="OscilloscopeView" Grid.Row="0"/>
+                <tp:WaveformOverviewView x:Name="WaveformOverviewControl" Grid.Row="1"
+                                         PositionSeconds="{Binding PositionSeconds}"
+                                         DurationSeconds="{Binding DurationSeconds}"/>
+            </Grid>
+
+            <!-- Navigation subsongs (UADE : TFMX et autres formats multi-morceaux ;
+                 ZXTune : conteneurs AY/SAP/HES) — 2026-07-30, retour utilisateur :
+                 "il faudrait 2 boutons supplémentaires pour passer d'une subsong à
+                 l'autre et avoir l'info dans l'oscilloscope". Générique côté UI
+                 (ITrackerPlayer.SubsongCount/SelectSubsong), fonctionne avec tout
+                 backend qui implémente réellement le contrat. Visible uniquement
+                 s'il y a plus d'un subsong ; superposé en haut de l'oscilloscope/
+                 pattern view, pas dans le header (dédié à la navigation playlist). -->
+            <Border Visibility="{Binding HasMultipleSubsongs,
+                        Converter={StaticResource BoolToVisibility}}"
+                    HorizontalAlignment="Center" VerticalAlignment="Top"
+                    Margin="0,6,0,0" Padding="4,2"
+                    Background="{DynamicResource BgApp}" Opacity="0.92"
+                    CornerRadius="4"
+                    BorderBrush="{DynamicResource Border}" BorderThickness="1">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="◀" Width="22" Height="22" Padding="0" FontSize="10"
+                            Style="{StaticResource IconButton}"
+                            Command="{Binding PreviousSubsongCommand}"
+                            ToolTip="Subsong précédente"/>
+                    <TextBlock Text="{Binding SubsongDisplay}" FontSize="10"
+                               FontFamily="Consolas" Margin="6,0"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextPrimary}"/>
+                    <Button Content="▶" Width="22" Height="22" Padding="0" FontSize="10"
+                            Style="{StaticResource IconButton}"
+                            Command="{Binding NextSubsongCommand}"
+                            ToolTip="Subsong suivante"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Sortie console pour les Executable Music (.exe console) -->
+            <Grid x:Name="ExeHostContainer" Background="{DynamicResource BgApp}"
+                  Visibility="Collapsed" Margin="0,4,0,0">
+                <ScrollViewer x:Name="ExeOutputScroller"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Auto"
+                              Padding="8">
+                    <StackPanel>
+                        <TextBlock FontFamily="Consolas" FontSize="11" Margin="0,0,0,8">
+                            <Run Text="▶ Executable Music en cours de lecture — " Foreground="{DynamicResource TextMuted}"/>
+                            <Run Text="{Binding ExeMusicName}" Foreground="{DynamicResource Accent}" FontWeight="SemiBold"/>
+                        </TextBlock>
+                        <TextBlock Text="{Binding ExeOutput}"
+                                   FontFamily="Consolas" FontSize="11"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   TextWrapping="NoWrap"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+
+            <!-- Chargement -->
+            <Border Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}"
+                    Background="{DynamicResource BgApp}" Opacity="0.92">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Conversion en cours…" FontSize="14" FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource TextPrimary}"/>
+                    <TextBlock Text="Certains formats (ex. SNDH/Atari ST) peuvent prendre jusqu'à une minute selon la durée du morceau."
+                               FontSize="11" Margin="0,6,0,0" MaxWidth="320" TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Foreground="{DynamicResource TextMuted}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Erreur -->
+            <Border Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisibility}}"
+                    Background="{DynamicResource BgApp}" Padding="12">
+                <TextBlock Text="{Binding ErrorMessage}" FontSize="11"
+                           Foreground="#FF5A5A" TextWrapping="Wrap"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- 2026-08-01, retour utilisateur : "quand un format n'est pas jouable,
+                 peux tu, au lieu d'afficher l'oscilloscope 'vide' mettre un message en
+                 'Format non jouable ...' [...] met le dans une police assez grande
+                 qu'on puisse le voir sans probleme" — remplace l'oscilloscope plat
+                 (silence, aucun signal visuel jusqu'ici) par un message explicite.
+                 N'apparaît que dans le même contexte que l'oscilloscope (pas de
+                 patterns), et jamais en même temps que le spinner de conversion ou le
+                 message d'erreur ci-dessus (cf. IsFormatUnsupported,
+                 SoundtrackPlayerViewModel.cs). -->
+            <Border Background="{DynamicResource BgApp}" Padding="20"
+                    Visibility="Collapsed">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsFormatUnsupported}" Value="True"/>
+                                    <Condition Binding="{Binding HasPatterns}"         Value="False"/>
+                                    <Condition Binding="{Binding IsLoading}"           Value="False"/>
+                                    <Condition Binding="{Binding ErrorMessage}"        Value="{x:Null}"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="{DynamicResource Msg_FormatNotPlayable}"
+                           FontSize="22" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextMuted}"
+                           TextWrapping="Wrap" TextAlignment="Center"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- Panneau "Infos" : ordre de lecture (position → pattern) + instruments/
+                 samples — même contenu que dans Full Pattern View (cf. BtnToggleInfo). -->
+            <Border x:Name="MainInfoPanelBorder" Grid.Column="1" Visibility="Visible"
+                    Background="{DynamicResource BgApp}" BorderBrush="{DynamicResource Border}"
+                    BorderThickness="1,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" x:Name="MainOrderListHeader"
+                               Text="Ordre" FontSize="10" FontFamily="Consolas"
+                               Foreground="{DynamicResource TextMuted}" Margin="8,6,8,4"/>
+                    <ListBox x:Name="MainOrderListBox" Grid.Row="1"
+                             Background="Transparent" BorderThickness="0"
+                             FontFamily="Consolas" FontSize="10"
+                             Foreground="{DynamicResource TextSecondary}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+
+                    <TextBlock Grid.Row="2" x:Name="MainInstrumentsHeader"
+                               Text="Instruments" FontSize="10" FontFamily="Consolas"
+                               Foreground="{DynamicResource TextMuted}" Margin="8,6,8,4"/>
+                    <ListBox x:Name="MainInstrumentsListBox" Grid.Row="3"
+                             Background="Transparent" BorderThickness="0"
+                             FontFamily="Consolas" FontSize="10"
+                             Foreground="{DynamicResource TextSecondary}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

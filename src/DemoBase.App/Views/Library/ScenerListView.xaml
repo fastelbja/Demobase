@@ -1,0 +1,225 @@
+<UserControl x:Class="DemoBase.App.Views.Library.ScenerListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource BgApp}">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" Background="{DynamicResource BgPanel}"
+                BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1"
+                Padding="20,14">
+            <DockPanel>
+                <TextBlock Text="{DynamicResource Nav_Artists}" FontSize="17" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
+                <Border DockPanel.Dock="Right" CornerRadius="3" Padding="8,3"
+                        Background="{DynamicResource BgHover}" VerticalAlignment="Center">
+                    <TextBlock FontSize="11" Foreground="{DynamicResource TextMuted}">
+                        <Run Text="{Binding TotalCount, Mode=OneWay}"/>
+                        <Run Text="{DynamicResource Count_Artists}"/>
+                    </TextBlock>
+                </Border>
+            </DockPanel>
+        </Border>
+        <Border DockPanel.Dock="Top" Padding="16,10"
+                BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+            <TextBox x:Name="SearchBox" Tag="search" Style="{StaticResource SearchBox}"
+                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                     PreviewKeyDown="SearchBox_PreviewKeyDown"/>
+        </Border>
+
+        <!-- Barre de lettres -->
+        <Border DockPanel.Dock="Top" Padding="12,7"
+                BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Disabled">
+                <StackPanel Orientation="Horizontal">
+                    <!-- Chip Tous -->
+                    <Border CornerRadius="3" Padding="8,4" Margin="0,0,3,0" Cursor="Hand">
+                        <Border.InputBindings>
+                            <MouseBinding MouseAction="LeftClick"
+                                Command="{Binding SelectLetterCommand}"
+                                CommandParameter="{x:Null}"/>
+                        </Border.InputBindings>
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource BgHover}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedLetter}" Value="{x:Null}">
+                                        <Setter Property="Background" Value="{DynamicResource Accent}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="{DynamicResource RL_All}" FontSize="11" FontWeight="SemiBold">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedLetter}" Value="{x:Null}">
+                                            <Setter Property="Foreground" Value="White"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                    <!-- Chips A-Z + # -->
+                    <ItemsControl ItemsSource="{Binding LetterChips}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:Name="ChipBd" CornerRadius="3" Padding="7,4"
+                                        Margin="0,0,3,0" Cursor="Hand">
+                                    <Border.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick"
+                                            Command="{Binding DataContext.SelectLetterCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"/>
+                                    </Border.InputBindings>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource Accent}"/>
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource BgHover}"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding Letter}" FontSize="11" FontWeight="SemiBold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="Foreground" Value="White"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        <Border DockPanel.Dock="Top" Padding="16,8"
+                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+            <ProgressBar IsIndeterminate="True" Width="100" Height="3"
+                         HorizontalAlignment="Left" BorderThickness="0"
+                         Foreground="{DynamicResource Accent}"
+                         Background="{DynamicResource BgHover}"/>
+        </Border>
+        <ScrollViewer x:Name="Scroll"
+ Style="{StaticResource SlimScrollViewer}"
+                      ScrollChanged="Scroll_ScrollChanged">
+            <StackPanel>
+                <ItemsControl x:Name="ItemsList" ItemsSource="{Binding Items}"
+                              VirtualizingStackPanel.IsVirtualizing="True"
+                              VirtualizingStackPanel.VirtualizationMode="Recycling">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><StackPanel/></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="ItemBd" Padding="20,11"
+                                    BorderBrush="{DynamicResource Border}"
+                                    BorderThickness="0,0,0,1"
+                                    Background="Transparent" Cursor="Hand">
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                        Command="{Binding DataContext.OpenScenerCommand,
+                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"/>
+                                </Border.InputBindings>
+                                <DockPanel>
+                                    <!-- Avatar initiales -->
+                                    <Border DockPanel.Dock="Left" Width="32" Height="32"
+                                            CornerRadius="16"
+                                            Background="{DynamicResource BgCard}"
+                                            BorderBrush="{DynamicResource Border}"
+                                            BorderThickness="1"
+                                            Margin="0,0,12,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name,
+                                                       Converter={StaticResource InitialsConverter}}"
+                                                   FontSize="11" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextSecondary}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                                        <!-- Ligne 1 : Nom + nb releases à droite -->
+                                        <DockPanel>
+                                            <TextBlock DockPanel.Dock="Right"
+                                                       FontSize="11" Margin="8,0,0,0"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextMuted}"
+                                                       Visibility="{Binding ReleaseCount,
+                                                           Converter={StaticResource NullToVisibility}}">
+                                                <Run Text="{Binding ReleaseCount, Mode=OneWay}"/>
+                                                <Run Text="{DynamicResource Count_Releases}"/>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding DisplayName}" FontSize="13"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource TextPrimary}"/>
+                                        </DockPanel>
+                                        <!-- Ligne 2 : Nom réel -->
+                                        <TextBlock FontSize="11" Margin="0,1,0,0"
+                                                   Foreground="{DynamicResource TextMuted}"
+                                                   FontStyle="Italic"
+                                                   Text="{Binding RealName, Mode=OneWay}"
+                                                   Visibility="{Binding RealName,
+                                                       Converter={StaticResource NullToVisibility}}"/>
+                                        <!-- Ligne 3 : Pays -->
+                                        <TextBlock FontSize="11" Margin="0,1,0,0"
+                                                   Text="{Binding Location}"
+                                                   Foreground="{DynamicResource TextMuted}"
+                                                   Visibility="{Binding Location,
+                                                       Converter={StaticResource NullToVisibility}}"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <!-- Sélection clavier : déclaré avant IsMouseOver pour
+                                     que la bordure Accent reste visible même sous la souris. -->
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <MultiBinding Converter="{StaticResource ReferenceEquality}">
+                                            <Binding Path="."/>
+                                            <Binding Path="DataContext.SelectedItem"
+                                                     RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                        </MultiBinding>
+                                    </DataTrigger.Binding>
+                                    <Setter TargetName="ItemBd" Property="Background"
+                                            Value="{DynamicResource BgSelected}"/>
+                                    <Setter TargetName="ItemBd" Property="BorderBrush"
+                                            Value="{DynamicResource Accent}"/>
+                                    <Setter TargetName="ItemBd" Property="BorderThickness"
+                                            Value="2,0,0,0"/>
+                                </DataTrigger>
+                                <Trigger SourceName="ItemBd" Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ItemBd" Property="Background"
+                                            Value="{DynamicResource BgHover}"/>
+                                </Trigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Border Padding="20,10"
+                        Visibility="{Binding IsLoadingMore, Converter={StaticResource BoolToVisibility}}">
+                    <ProgressBar IsIndeterminate="True" Width="80" Height="3"
+                                 HorizontalAlignment="Center" BorderThickness="0"
+                                 Foreground="{DynamicResource Accent}"
+                                 Background="{DynamicResource BgHover}"/>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

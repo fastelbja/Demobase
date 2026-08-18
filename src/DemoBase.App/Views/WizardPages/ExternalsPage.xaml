@@ -1,0 +1,31 @@
+<UserControl x:Class="DemoBase.App.Views.WizardPages.ExternalsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:DemoBase.App.Views">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="{DynamicResource Wiz_ExtTitle}" FontSize="28" FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimary}"
+                       Margin="0,0,0,6"/>
+            <TextBlock FontSize="13" Foreground="{DynamicResource TextSecondary}"
+                       TextWrapping="Wrap"
+                       Text="{DynamicResource Wiz_ExtSubtitle}"/>
+        </StackPanel>
+
+        <!-- Reuses the same installer view/list as the Emulators step -->
+        <Border Grid.Row="1"
+                BorderBrush="{DynamicResource Border}"
+                BorderThickness="1" CornerRadius="6"
+                ClipToBounds="True">
+            <views:EmulatorInstallerView x:Name="InstallerView"/>
+        </Border>
+
+    </Grid>
+</UserControl>

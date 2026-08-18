@@ -1,0 +1,834 @@
+<UserControl x:Class="DemoBase.App.Views.Emulators.EmulatorSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DemoBase.App.ViewModels.Emulators"
+             xmlns:ctrl="clr-namespace:DemoBase.App.Views.Emulators"
+             xmlns:services="clr-namespace:DemoBase.App.Services"
+             Background="{DynamicResource BgApp}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="290"/>
+            <ColumnDefinition Width="1"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ── Colonne gauche : liste des émulateurs ─────────────────── -->
+        <DockPanel Grid.Column="0">
+            <!-- Header -->
+            <Border DockPanel.Dock="Top" Padding="16,12"
+                    Background="{DynamicResource BgPanel}"
+                    BorderBrush="{DynamicResource Border}"
+                    BorderThickness="0,0,0,1">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource Emu_Title}" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}"
+                               Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{StaticResource IconButton}"
+                                Content="{DynamicResource Emu_DownloadUpdate}" Padding="8,4" FontSize="11"
+                                Margin="0,0,8,0"
+                                Command="{Binding OpenDownloadManagerCommand}"
+                                ToolTip="{DynamicResource Emu_DownloadUpdateTip}"/>
+                        <Button Style="{StaticResource IconButton}"
+                                Content="{DynamicResource Emu_DownloadBios}" Padding="8,4" FontSize="11"
+                                Margin="0,0,8,0"
+                                Command="{Binding DownloadBiosPackCommand}"
+                                IsEnabled="{Binding BiosVm.IsBiosDownloading,
+                                    Converter={StaticResource InverseBool}}"
+                                ToolTip="{DynamicResource Pref_BiosPackDesc}"/>
+                        <Button Style="{StaticResource AccentButton}"
+                                Content="{DynamicResource List_Add}" Padding="8,4" FontSize="11"
+                                Command="{Binding AddEmulatorCommand}"/>
+                    </StackPanel>
+                    <!-- Progression BIOS -->
+                    <StackPanel Visibility="{Binding BiosVm.IsBiosDownloading,
+                                    Converter={StaticResource BoolToVisibility}}"
+                                Margin="0,6,0,0">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="{Binding BiosVm.BiosDownloadPercent, StringFormat={}{0} %}"
+                                       FontSize="10" Foreground="{DynamicResource TextMuted}"/>
+                            <TextBlock Text="{Binding BiosVm.BiosDownloadLabel}"
+                                       FontSize="10" Foreground="{DynamicResource TextMuted}"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </DockPanel>
+                        <ProgressBar Value="{Binding BiosVm.BiosDownloadPercent}"
+                                     Minimum="0" Maximum="100" Height="4" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding BiosVm.BiosStatusMessage}"
+                               FontSize="10" Foreground="{DynamicResource Accent}"
+                               TextWrapping="Wrap" Margin="0,4,0,0"
+                               Visibility="{Binding BiosVm.BiosStatusMessage,
+                                   Converter={StaticResource NullToVisibility}}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Spinner -->
+            <Border DockPanel.Dock="Top" Padding="16,8"
+                    Visibility="{Binding IsLoading,
+                        Converter={StaticResource BoolToVisibility}}">
+                <ProgressBar IsIndeterminate="True" Width="80" Height="3"
+                             HorizontalAlignment="Left" BorderThickness="0"
+                             Foreground="{DynamicResource Accent}"
+                             Background="{DynamicResource BgHover}"/>
+            </Border>
+
+            <!-- Liste des émulateurs -->
+            <ScrollViewer Style="{StaticResource SlimScrollViewer}">
+                <ItemsControl ItemsSource="{Binding Emulators}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="ItemBd"
+                                    Padding="16,10"
+                                    BorderBrush="{DynamicResource Border}"
+                                    BorderThickness="0,0,0,1"
+                                    Background="Transparent" Cursor="Hand">
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                        Command="{Binding DataContext.SetSelectedCommand,
+                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"/>
+                                </Border.InputBindings>
+                                <DockPanel>
+                                    <!-- Indicateur exécutable OK/KO -->
+                                    <Border DockPanel.Dock="Left"
+                                            Width="6" CornerRadius="3"
+                                            Margin="0,0,10,0" VerticalAlignment="Stretch">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background"
+                                                        Value="{DynamicResource Red}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ExecutableOk}"
+                                                                 Value="True">
+                                                        <Setter Property="Background"
+                                                                Value="{DynamicResource Green}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="13" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextPrimary}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock FontSize="11" Margin="0,2,0,0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground"
+                                                            Value="{DynamicResource TextMuted}"/>
+                                                </Style>
+                                            </TextBlock.Style>
+                                            <Run Text="{Binding Profiles.Count, Mode=OneWay}"/>
+                                            <Run Text=" profil(s)"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter TargetName="ItemBd" Property="Background"
+                                            Value="{DynamicResource BgSelected}"/>
+                                </DataTrigger>
+                                <Trigger SourceName="ItemBd" Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ItemBd" Property="Background"
+                                            Value="{DynamicResource BgHover}"/>
+                                </Trigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+
+        <Border Grid.Column="1" Background="{DynamicResource Border}"/>
+
+        <!-- ── Colonne droite : détail de l'émulateur sélectionné ───── -->
+        <ScrollViewer Grid.Column="2" Style="{StaticResource SlimScrollViewer}"
+                      Padding="24,20,24,24">
+            <StackPanel>
+                <!-- Message vide -->
+                <TextBlock Text="{DynamicResource Emu_SelectOrCreate}"
+                           FontSize="13" Foreground="{DynamicResource TextMuted}"
+                           HorizontalAlignment="Center" Margin="0,40,0,0"
+                           Visibility="{Binding Selected,
+                               Converter={StaticResource InverseBoolToVisibility}}"/>
+
+                <!-- Fiche émulateur -->
+                <StackPanel DataContext="{Binding Selected}"
+                            Visibility="{Binding DataContext.Selected,
+                                RelativeSource={RelativeSource AncestorType=UserControl},
+                                Converter={StaticResource NullToVisibility}}">
+
+                    <!-- ── Infos émulateur ──────────────────────────────── -->
+                    <Border Background="{DynamicResource BgCard}"
+                            BorderBrush="{DynamicResource Border}" BorderThickness="1"
+                            CornerRadius="{StaticResource RadiusLg}"
+                            Padding="18,14" Margin="0,0,0,20">
+                        <StackPanel>
+                            <!-- Header fiche -->
+                            <DockPanel Margin="0,0,0,14">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <Button Style="{StaticResource IconButton}"
+                                            Content="{DynamicResource App_Delete}" Padding="8,5"
+                                            FontSize="11" Foreground="{DynamicResource Red}"
+                                            Command="{Binding DataContext.DeleteEmulatorCommand,
+                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"/>
+                                    <Button Style="{StaticResource IconButton}"
+                                            Content="{DynamicResource App_Edit}" Padding="8,5"
+                                            FontSize="11" Margin="6,0,0,0"
+                                            Command="{Binding EditCommand}"
+                                            Visibility="{Binding IsEditing,
+                                                Converter={StaticResource InverseBoolToVisibility}}"/>
+                                    <Button Style="{StaticResource AccentButton}"
+                                            Content="{DynamicResource App_SaveShort}" Padding="10,5"
+                                            FontSize="11" Margin="6,0,0,0"
+                                            Command="{Binding SaveCommand}"
+                                            Visibility="{Binding IsEditing,
+                                                Converter={StaticResource BoolToVisibility}}"/>
+                                    <Button Style="{StaticResource IconButton}"
+                                            Content="{DynamicResource App_Cancel}" Padding="8,5"
+                                            FontSize="11" Margin="6,0,0,0"
+                                            Command="{Binding CancelEditCommand}"
+                                            Visibility="{Binding IsEditing,
+                                                Converter={StaticResource BoolToVisibility}}"/>
+                                </StackPanel>
+                                <TextBlock Text="{DynamicResource Emu_EmulatorLabel}" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextMuted}"
+                                           VerticalAlignment="Center"/>
+                            </DockPanel>
+
+                            <!-- Mode lecture -->
+                            <StackPanel Visibility="{Binding IsEditing,
+                                            Converter={StaticResource InverseBoolToVisibility}}">
+                                <TextBlock Text="{Binding Name}"
+                                           FontSize="18" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}"
+                                           Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding Version}"
+                                           FontSize="11" Foreground="{DynamicResource TextMuted}"
+                                           Margin="0,0,0,10"/>
+                                <DockPanel Margin="0,0,0,4">
+                                    <TextBlock Text="{Binding ExecutableStatus}"
+                                               FontSize="11" DockPanel.Dock="Right"
+                                               Margin="8,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource Red}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ExecutableOk}"
+                                                                 Value="True">
+                                                        <Setter Property="Foreground"
+                                                                Value="{DynamicResource Green}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding ExecutablePath}"
+                                               FontSize="11" Foreground="{DynamicResource TextSecondary}"
+                                               FontFamily="Consolas" TextTrimming="CharacterEllipsis"/>
+                                </DockPanel>
+                                <Button Style="{StaticResource LinkButton}"
+                                        Content="{Binding Website}" FontSize="11"
+                                        Visibility="{Binding Website,
+                                            Converter={StaticResource NullToVisibility}}"
+                                        Click="BtnWebsite_Click"/>
+                                <TextBlock Text="{Binding Notes}" FontSize="11"
+                                           Foreground="{DynamicResource TextMuted}"
+                                           TextWrapping="Wrap" Margin="0,8,0,0"
+                                           Visibility="{Binding Notes,
+                                               Converter={StaticResource NullToVisibility}}"/>
+                            </StackPanel>
+
+                            <!-- Mode édition -->
+                            <StackPanel Visibility="{Binding IsEditing,
+                                            Converter={StaticResource BoolToVisibility}}">
+
+                                <!-- Type d'émulateur -->
+                                <TextBlock Text="{DynamicResource Emu_Type}" Style="{StaticResource FieldLabel}" Margin="0,0,0,4"/>
+                                <ComboBox Style="{StaticResource FlatComboBox}" Margin="0,0,0,12"
+                                          ItemsSource="{x:Static services:EmulatorTypeCatalog.All}"
+                                          DisplayMemberPath="Label"
+                                          SelectedValuePath="Type"
+                                          SelectedValue="{Binding EmulatorType}"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="16"/>
+                                        <ColumnDefinition Width="120"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{DynamicResource Emu_Name}" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox Text="{Binding Name,
+                                                     UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource SearchBox}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="{DynamicResource Emu_Version}" Style="{StaticResource FieldLabel}"/>
+                                        <TextBox Text="{Binding Version,
+                                                     UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource SearchBox}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="{DynamicResource Emu_Executable}" Style="{StaticResource FieldLabel}"/>
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right"
+                                                Style="{StaticResource IconButton}"
+                                                Content="…" Width="32" Margin="6,0,0,0"
+                                                Command="{Binding BrowseExecutableCommand}"/>
+                                        <TextBox Text="{Binding ExecutablePath,
+                                                     UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{StaticResource SearchBox}"
+                                                 FontFamily="Consolas" FontSize="11"/>
+                                    </DockPanel>
+                                    <TextBlock Text="{Binding ExecutableStatus}"
+                                               FontSize="11" Margin="0,4,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource Red}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ExecutableOk}"
+                                                                 Value="True">
+                                                        <Setter Property="Foreground"
+                                                                Value="{DynamicResource Green}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="{DynamicResource Emu_Website}" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox Text="{Binding Website,
+                                                 UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource SearchBox}"/>
+                                </StackPanel>
+
+                                <StackPanel>
+                                    <TextBlock Text="{DynamicResource RD_Notes}" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox Text="{Binding Notes,
+                                                 UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource SearchBox}"
+                                             AcceptsReturn="True" Height="60"
+                                             VerticalScrollBarVisibility="Auto"
+                                             VerticalContentAlignment="Top"
+                                             TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ── Profils de lancement ────────────────────────── -->
+                    <DockPanel Margin="0,0,0,12">
+                        <Button DockPanel.Dock="Right"
+                                Style="{StaticResource AccentButton}"
+                                Content="{DynamicResource Emu_AddProfile}" Padding="8,4" FontSize="11"
+                                Command="{Binding AddProfileCommand}"/>
+                        <TextBlock Text="{DynamicResource Emu_Profiles}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   VerticalAlignment="Center"/>
+                    </DockPanel>
+
+                    <ItemsControl ItemsSource="{Binding Profiles}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource BgCard}"
+                                        BorderBrush="{DynamicResource Border}"
+                                        BorderThickness="1"
+                                        CornerRadius="{StaticResource RadiusLg}"
+                                        Padding="16,12" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <!-- Header profil -->
+                                        <DockPanel Margin="0,0,0,10">
+                                            <StackPanel DockPanel.Dock="Right"
+                                                        Orientation="Horizontal">
+                                                <Border CornerRadius="3" Padding="6,2"
+                                                        Background="{DynamicResource Accent}"
+                                                        Margin="0,0,8,0"
+                                                        Visibility="{Binding IsDefault,
+                                                            Converter={StaticResource BoolToVisibility}}">
+                                                    <TextBlock Text="{DynamicResource Emu_Default}" FontSize="10"
+                                                               Foreground="White"/>
+                                                </Border>
+                                                <Button Style="{StaticResource IconButton}"
+                                                        Content="{DynamicResource App_Delete}" Padding="6,4"
+                                                        FontSize="11"
+                                                        Foreground="{DynamicResource Red}"
+                                                        Command="{Binding DataContext.Selected.DeleteProfileCommand,
+                                                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Visibility="{Binding IsEditing,
+                                                            Converter={StaticResource InverseBoolToVisibility}}"/>
+                                                <Button Style="{StaticResource IconButton}"
+                                                        Content="✎" Padding="6,4"
+                                                        FontSize="12" Margin="6,0,0,0"
+                                                        Command="{Binding EditCommand}"
+                                                        Visibility="{Binding IsEditing,
+                                                            Converter={StaticResource InverseBoolToVisibility}}"/>
+                                                <Button Style="{StaticResource AccentButton}"
+                                                        Content="✓" Padding="8,4"
+                                                        FontSize="12" Margin="6,0,0,0"
+                                                        Command="{Binding SaveCommand}"
+                                                        Visibility="{Binding IsEditing,
+                                                            Converter={StaticResource BoolToVisibility}}"/>
+                                                <Button Style="{StaticResource IconButton}"
+                                                        Content="✕" Padding="6,4"
+                                                        FontSize="12" Margin="4,0,0,0"
+                                                        Command="{Binding CancelEditCommand}"
+                                                        Visibility="{Binding IsEditing,
+                                                            Converter={StaticResource BoolToVisibility}}"/>
+                                            </StackPanel>
+
+                                            <!-- Nom + plateforme -->
+                                            <StackPanel Visibility="{Binding IsEditing,
+                                                            Converter={StaticResource InverseBoolToVisibility}}">
+                                                <TextBlock Text="{Binding ProfileName}"
+                                                           FontSize="14" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource TextPrimary}"/>
+                                                <TextBlock Text="{Binding PlatformName}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource TextAccent}"
+                                                           Margin="0,2,0,0"/>
+                                            </StackPanel>
+
+                                            <!-- Sélecteurs en édition -->
+                                            <Grid Visibility="{Binding IsEditing,
+                                                      Converter={StaticResource BoolToVisibility}}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="12"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{DynamicResource Emu_ProfileName}"
+                                                               Style="{StaticResource FieldLabel}"/>
+                                                    <TextBox Text="{Binding ProfileName,
+                                                                 UpdateSourceTrigger=PropertyChanged}"
+                                                             Style="{StaticResource SearchBox}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="2">
+                                                    <TextBlock Text="{DynamicResource Emu_Platform}"
+                                                               Style="{StaticResource FieldLabel}"/>
+                                                    <ComboBox ItemsSource="{Binding AvailablePlatforms}"
+                                                              SelectedValuePath="Id"
+                                                              SelectedValue="{Binding PlatformId}"
+                                                              DisplayMemberPath="Name"
+                                                              Style="{StaticResource FlatComboBox}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DockPanel>
+
+                                        <!-- Séparateur -->
+                                        <Border Height="1" Background="{DynamicResource Border}"
+                                                Margin="0,0,0,10"/>
+
+                                        <!-- Mode lecture : ligne de commande -->
+                                        <StackPanel Visibility="{Binding IsEditing,
+                                                        Converter={StaticResource InverseBoolToVisibility}}">
+                                            <TextBlock Text="{DynamicResource Emu_CmdLine}"
+                                                       Style="{StaticResource FieldLabel}"/>
+                                            <TextBlock Text="{Binding CommandLine}"
+                                                       FontFamily="Consolas" FontSize="11"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
+
+                                        <!-- Mode édition : tous les champs -->
+                                        <StackPanel Visibility="{Binding IsEditing,
+                                                        Converter={StaticResource BoolToVisibility}}">
+
+                                            <!-- Ligne de commande -->
+                                            <StackPanel Margin="0,0,0,10">
+                                                <DockPanel Margin="0,0,0,4">
+                                                    <Button DockPanel.Dock="Right"
+                                                            Style="{StaticResource LinkButton}"
+                                                            Content="{DynamicResource Emu_Test}"
+                                                            FontSize="11"
+                                                            Command="{Binding TestCommandLineCommand}"/>
+                                                    <TextBlock Text="{DynamicResource Emu_CmdLine}"
+                                                               Style="{StaticResource FieldLabel}"
+                                                               Margin="0,0,0,0"
+                                                               VerticalAlignment="Center"/>
+                                                </DockPanel>
+                                                <TextBox Text="{Binding CommandLine,
+                                                             UpdateSourceTrigger=PropertyChanged}"
+                                                         Style="{StaticResource SearchBox}"
+                                                         FontFamily="Consolas" FontSize="11"/>
+                                                <TextBlock Text="{Binding Source={x:Static vm:ProfileViewModel.VariablesHelp}}"
+                                                           FontSize="10"
+                                                           Foreground="{DynamicResource TextMuted}"
+                                                           Margin="0,4,0,0" TextWrapping="Wrap"/>
+                                            </StackPanel>
+
+                                            <!-- Options en ligne -->
+                                            <WrapPanel Margin="0,0,0,10">
+                                                <CheckBox IsChecked="{Binding IsDefault}"
+                                                          Content="{DynamicResource Emu_DefaultPlatform}"
+                                                          Foreground="{DynamicResource TextSecondary}"
+                                                          FontSize="12"/>
+                                            </WrapPanel>
+
+                                            <!-- Fichier de config -->
+                                            <StackPanel Margin="0,0,0,10">
+                                                <TextBlock Text="{DynamicResource Emu_ConfigFile}"
+                                                           Style="{StaticResource FieldLabel}"/>
+                                                <DockPanel>
+                                                    <Button DockPanel.Dock="Right"
+                                                            Style="{StaticResource IconButton}"
+                                                            Content="…" Width="32" Margin="6,0,0,0"
+                                                            Command="{Binding BrowseConfigFileCommand}"/>
+                                                    <TextBox Text="{Binding ConfigFilePath,
+                                                                 UpdateSourceTrigger=PropertyChanged}"
+                                                             Style="{StaticResource SearchBox}"
+                                                             FontFamily="Consolas" FontSize="11"/>
+                                                </DockPanel>
+                                            </StackPanel>
+
+                                            <!-- Script pré-lancement — masqué pour le moment (pas utile
+                                                 actuellement, mais conservé en l'état pour réutilisation
+                                                 future : repasser Visibility à Visible pour le réafficher,
+                                                 rien d'autre à changer). -->
+                                            <StackPanel Margin="0,0,0,10" Visibility="Collapsed">
+                                                <TextBlock Text="{DynamicResource Emu_PreScript}"
+                                                           Style="{StaticResource FieldLabel}"/>
+                                                <TextBox Text="{Binding PreLaunchScript,
+                                                             UpdateSourceTrigger=PropertyChanged}"
+                                                         Style="{StaticResource SearchBox}"
+                                                         FontFamily="Consolas" FontSize="11"
+                                                         AcceptsReturn="True" Height="50"
+                                                         VerticalScrollBarVisibility="Auto"
+                                                         VerticalContentAlignment="Top"
+                                                         TextWrapping="Wrap"/>
+                                                <TextBlock Text="{DynamicResource Emu_PreScriptDesc}"
+                                                           FontSize="10"
+                                                           Foreground="{DynamicResource TextMuted}"
+                                                           Margin="0,3,0,0"/>
+                                            </StackPanel>
+
+                                        </StackPanel>
+
+                                        <!-- ── Configuration spécifique à ce profil ────────── -->
+                                        <!-- Affichée dès que les settings sont chargés (cf. ProfileViewModel).
+                                             Toujours visible même hors édition (pour consultation), mais tout
+                                             le bloc est verrouillé (IsEnabled=False) tant que IsEditing est
+                                             faux — évite de pouvoir modifier ces champs sans être passé par
+                                             "Edition" puis "Sauvegarde" (cf. bouton ✎ / ✓ plus haut).
+                                             Border externe : Visibility liée au DataContext ambiant (le profil) ;
+                                             contrôle interne : DataContext rebindé sur les settings eux-mêmes
+                                             (cf. le même pattern à deux éléments utilisé dans FavoriteGraphicsView.xaml,
+                                             plus sûr qu'un DataContext+Visibility sur un seul et même élément). -->
+                                        <StackPanel IsEnabled="{Binding IsEditing}">
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding WinUAESettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:WinUAESettingsControl DataContext="{Binding WinUAESettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding AltirraSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:AltirraSettingsControl DataContext="{Binding AltirraSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding HatariSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:HatariSettingsControl DataContext="{Binding HatariSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding CpcecSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:CpcecSettingsControl DataContext="{Binding CpcecSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ZxsecSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ZxsecSettingsControl DataContext="{Binding ZxsecSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding CsfecSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:CsfecSettingsControl DataContext="{Binding CsfecSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding MsxecSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:MsxecSettingsControl DataContext="{Binding MsxecSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding DosBoxXSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:DosBoxXSettingsControl DataContext="{Binding DosBoxXSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ViceC64Settings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ViceC64SettingsControl DataContext="{Binding ViceC64Settings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ViceC128Settings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ViceC128SettingsControl DataContext="{Binding ViceC128Settings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ViceVic20Settings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ViceVic20SettingsControl DataContext="{Binding ViceVic20Settings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding VicePetSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:VicePetSettingsControl DataContext="{Binding VicePetSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ViceC64DtvSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ViceC64DtvSettingsControl DataContext="{Binding ViceC64DtvSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding VicePlus4Settings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:VicePlus4SettingsControl DataContext="{Binding VicePlus4Settings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding Tic80Settings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:Tic80SettingsControl DataContext="{Binding Tic80Settings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding PemsaSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:PemsaSettingsControl DataContext="{Binding PemsaSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding MesenSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:MesenSettingsControl DataContext="{Binding MesenSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding AzaharSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:AzaharSettingsControl DataContext="{Binding AzaharSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding MicroW8Settings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:MicroW8SettingsControl DataContext="{Binding MicroW8Settings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding UnrealSpeccySettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:UnrealSpeccySettingsControl DataContext="{Binding UnrealSpeccySettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding EightyOneSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:EightyOneSettingsControl DataContext="{Binding EightyOneSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ZEsarUXSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ZEsarUXSettingsControl DataContext="{Binding ZEsarUXSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding KegaFusionSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:KegaFusionSettingsControl DataContext="{Binding KegaFusionSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding BrowserSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:BrowserSettingsControl DataContext="{Binding BrowserSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding JavaSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:JavaSettingsControl DataContext="{Binding JavaSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding FuseSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:FuseSettingsControl DataContext="{Binding FuseSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding BlastEmSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:BlastEmSettingsControl DataContext="{Binding BlastEmSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ArculatorSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ArculatorSettingsControl DataContext="{Binding ArculatorSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding PPSSPPSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:PPSSPPSettingsControl DataContext="{Binding PPSSPPSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding BlueMSXSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:BlueMSXSettingsControl DataContext="{Binding BlueMSXSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding DuckStationSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:DuckStationSettingsControl DataContext="{Binding DuckStationSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding Pcsx2Settings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:Pcsx2SettingsControl DataContext="{Binding Pcsx2Settings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding Trs80gpSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:Trs80gpSettingsControl DataContext="{Binding Trs80gpSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding OricutronSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:OricutronSettingsControl DataContext="{Binding OricutronSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding DolphinSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:DolphinSettingsControl DataContext="{Binding DolphinSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding SimCoupeSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:SimCoupeSettingsControl DataContext="{Binding SimCoupeSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding FlycastSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:FlycastSettingsControl DataContext="{Binding FlycastSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding JzIntvSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:JzIntvSettingsControl DataContext="{Binding JzIntvSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding DcmotoSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:DcmotoSettingsControl DataContext="{Binding DcmotoSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding Xm6TypeGSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:Xm6TypeGSettingsControl DataContext="{Binding Xm6TypeGSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding BeebEmSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:BeebEmSettingsControl DataContext="{Binding BeebEmSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding SinclairQlSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:SQLuxSettingsControl DataContext="{Binding SinclairQlSettings}"/>
+                                        </Border>
+                                        <!-- RyujinxSettingsControl retiré le 2026-07-24 -->
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding PuNESSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:PuNESSettingsControl DataContext="{Binding PuNESSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding AresSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:AresSettingsControl DataContext="{Binding AresSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding RuffleSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:RuffleSettingsControl DataContext="{Binding RuffleSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding MameSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:MameSettingsControl DataContext="{Binding MameSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding StellaSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:StellaSettingsControl DataContext="{Binding StellaSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ProSystemSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ProSystemSettingsControl DataContext="{Binding ProSystemSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding XeniaSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:XeniaSettingsControl DataContext="{Binding XeniaSettings}"/>
+                                        </Border>
+                                        <!-- Rpcs3SettingsControl retiré le 2026-07-24 -->
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding BigPEmuSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:BigPEmuSettingsControl DataContext="{Binding BigPEmuSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding HandySettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:HandySettingsControl DataContext="{Binding HandySettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding GeePee32Settings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:GeePee32SettingsControl DataContext="{Binding GeePee32Settings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding Ep128EmuSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:Ep128EmuSettingsControl DataContext="{Binding Ep128EmuSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding Mz800EmuSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:Mz800EmuSettingsControl DataContext="{Binding Mz800EmuSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding ColEmSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:ColEmSettingsControl DataContext="{Binding ColEmSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding CxbxReloadedSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:CxbxReloadedSettingsControl DataContext="{Binding CxbxReloadedSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding AppleWinSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:AppleWinSettingsControl DataContext="{Binding AppleWinSettings}"/>
+                                        </Border>
+                                        <Border Margin="0,10,0,0"
+                                                Visibility="{Binding GSplusSettings,
+                                                    Converter={StaticResource NullToVisibility}}">
+                                            <ctrl:GSplusSettingsControl DataContext="{Binding GSplusSettings}"/>
+                                        </Border>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

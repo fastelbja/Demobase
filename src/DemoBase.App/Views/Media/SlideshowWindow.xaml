@@ -1,0 +1,74 @@
+<Window x:Class="DemoBase.App.Views.Media.SlideshowWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        WindowState="Maximized"
+        Background="Black"
+        Cursor="None"
+        Focusable="True">
+
+    <Grid>
+        <!-- Image principale -->
+        <Image x:Name="MainImage"
+               Stretch="Uniform"
+               RenderOptions.BitmapScalingMode="HighQuality"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"/>
+
+        <!-- Overlay infos (bas de l'écran) -->
+        <Border VerticalAlignment="Bottom"
+                HorizontalAlignment="Stretch"
+                Background="#AA000000"
+                Padding="24,14"
+                x:Name="InfoBar">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock x:Name="TitleText"
+                               FontSize="18" FontWeight="Bold"
+                               Foreground="White"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="AuthorText"
+                               FontSize="13" Foreground="#CCFFFFFF"
+                               Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center"
+                            HorizontalAlignment="Right">
+                    <TextBlock x:Name="CounterText"
+                               FontSize="12" Foreground="#AAFFFFFF"
+                               HorizontalAlignment="Right"/>
+                    <TextBlock Text="Échap pour quitter  ·  ← → pour naviguer  ·  Espace pour pause"
+                               FontSize="10" Foreground="#66FFFFFF"
+                               HorizontalAlignment="Right"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Barre de progression -->
+        <ProgressBar x:Name="ProgressBar"
+                     VerticalAlignment="Bottom"
+                     Height="3"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Foreground="#885B9BD5"
+                     Margin="0,0,0,48"/>
+
+        <!-- Indicateur pause -->
+        <Border x:Name="PauseIndicator"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="#88000000" CornerRadius="50"
+                Width="100" Height="100"
+                Visibility="Collapsed">
+            <TextBlock Text="⏸" FontSize="40"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="White"/>
+        </Border>
+    </Grid>
+</Window>
