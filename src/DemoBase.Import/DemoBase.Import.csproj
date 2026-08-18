@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>DemoBase.Import</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Parser du format COPY PostgreSQL + gzip streaming -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DemoBase.Core\DemoBase.Core.csproj" />
+    <ProjectReference Include="..\DemoBase.Data\DemoBase.Data.csproj" />
+  </ItemGroup>
+</Project>

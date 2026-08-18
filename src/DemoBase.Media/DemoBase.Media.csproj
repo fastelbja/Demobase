@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>DemoBase.Media</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="LibVLCSharp" Version="3.9.0" />
+  </ItemGroup>
+
+  <!-- Exclure l'ancien Services.cs si présent (remplacé par notre version) -->
+  <ItemGroup>
+    <Compile Remove="MediaServices.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DemoBase.Core\DemoBase.Core.csproj" />
+    <ProjectReference Include="..\DemoBase.Data\DemoBase.Data.csproj" />
+  </ItemGroup>
+</Project>
