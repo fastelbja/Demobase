@@ -351,9 +351,21 @@ public static class EmulatorDownloadCatalog
             DisplayName  = "EightyOne",
             Systems      = "ZX80 / ZX81",
             Strategy     = DownloadStrategy.DirectUrl,
-            Source       = "https://master.dl.sourceforge.net/project/eightyone-sinclair-emulator/EightyOne%20V1.41.zip?viasf=1",
+            // 2026-08-21, retour utilisateur (popup d'échec d'extraction) : SourceForge a
+            // durci son infrastructure anti-bot ces dernières semaines — toutes les
+            // variantes d'URL testées (master.dl direct, sourceforge.net/.../download,
+            // downloads.sourceforge.net, ?use_mirror=X) renvoient désormais une page HTML
+            // interstitielle ("Your download will start shortly...") dont le vrai
+            // téléchargement n'est déclenché que par JavaScript côté navigateur — aucun
+            // client HTTP pur ne peut plus le contourner de façon fiable (cf.
+            // EmulatorInstallerService, _httpSourceForge, pour le détail des tentatives).
+            // Décision utilisateur : héberger ce fichier directement sur
+            // http://demobase.free.fr/emus/ (même principe que la migration DBSetup
+            // Mega→HTTP) — fiable à 100%, ne dépend plus du comportement de SourceForge.
+            Source          = "http://demobase.free.fr/emus/EightyOne%20V1.41.zip",
+            VersionOverride = "1.41",
             ExeName      = "EightyOne.exe",
-            Note         = "Version 1.41 — master.dl.sourceforge.net contourne la page HTML de sélection de mirroir",
+            Note         = "Version 1.41 — hébergé sur demobase.free.fr (SourceForge exige désormais JavaScript pour tout téléchargement, incompatible avec un installeur automatisé)",
         },
 
         // ── Fuse (ZX Spectrum Windows port) ───────────────────────────────
@@ -363,9 +375,13 @@ public static class EmulatorDownloadCatalog
             DisplayName  = "Fuse",
             Systems      = "ZX Spectrum",
             Strategy     = DownloadStrategy.DirectUrl,
-            Source       = "https://master.dl.sourceforge.net/project/fuse-emulator/fuse/1.9.0/fuse-1.9.0-win32.zip?viasf=1",
+            // 2026-08-21 : cf. commentaire détaillé sur l'entrée EightyOne ci-dessus — même
+            // correctif (hébergement sur demobase.free.fr, SourceForge exigeant désormais
+            // JavaScript pour tout téléchargement).
+            Source          = "http://demobase.free.fr/emus/fuse-1.9.0-win32.zip",
+            VersionOverride = "1.9.0",
             ExeName      = "fuse.exe",
-            Note         = "Version 1.9.0 — master.dl.sourceforge.net contourne la page HTML de sélection de mirroir",
+            Note         = "Version 1.9.0 — hébergé sur demobase.free.fr (SourceForge exige désormais JavaScript pour tout téléchargement, incompatible avec un installeur automatisé)",
         },
 
         // ── Kega Fusion (Sega Genesis/MD/CD/32X) ──────────────────────────
@@ -400,9 +416,13 @@ public static class EmulatorDownloadCatalog
             DisplayName  = "Hatari",
             Systems      = "Atari ST/STE/Falcon",
             Strategy     = DownloadStrategy.DirectUrl,
-            Source       = "https://master.dl.sourceforge.net/project/hatari/hatari/2.6.1/hatari-2.6.1_windows64.zip?viasf=1",
+            // 2026-08-21 : cf. commentaire détaillé sur l'entrée EightyOne plus haut — même
+            // correctif (hébergement sur demobase.free.fr, SourceForge exigeant désormais
+            // JavaScript pour tout téléchargement).
+            Source          = "http://demobase.free.fr/emus/hatari-2.6.1_windows64.zip",
+            VersionOverride = "2.6.1",
             ExeName      = "hatari.exe",
-            Note         = "Version 2.6.1 — le repo GitHub n'est qu'un miroir source, les releases officielles sont sur framagit.org",
+            Note         = "Version 2.6.1 — le repo GitHub n'est qu'un miroir source, les releases officielles sont sur framagit.org. Hébergé sur demobase.free.fr (SourceForge exige désormais JavaScript pour tout téléchargement).",
         },
 
         // ── KEGS (Apple IIgs) ──────────────────────────────────────────────
@@ -584,9 +604,13 @@ public static class EmulatorDownloadCatalog
             DisplayName  = "VICE",
             Systems      = "Commodore C64/C128/VIC20/PET",
             Strategy     = DownloadStrategy.DirectUrl,
-            Source       = "https://master.dl.sourceforge.net/project/vice-emu/releases/binaries/windows/GTK3VICE-3.10-win64.zip?viasf=1",
+            // 2026-08-21 : cf. commentaire détaillé sur l'entrée EightyOne plus haut — même
+            // correctif (hébergement sur demobase.free.fr, SourceForge exigeant désormais
+            // JavaScript pour tout téléchargement).
+            Source          = "http://demobase.free.fr/emus/GTK3VICE-3.10-win64.zip",
+            VersionOverride = "3.10",
             ExeName      = "x64sc.exe",
-            Note         = "Version 3.10 (GTK3, win64) — contient tous les émulateurs VICE",
+            Note         = "Version 3.10 (GTK3, win64) — contient tous les émulateurs VICE. Hébergé sur demobase.free.fr (SourceForge exige désormais JavaScript pour tout téléchargement).",
         },
 
         // ── WinUAE (Amiga) ────────────────────────────────────────────────
@@ -646,8 +670,10 @@ public static class EmulatorDownloadCatalog
         },
 
         // ── Handy (Atari Lynx) ────────────────────────────────────────────────
-        // Distribué sur SourceForge (plus maintenu, dernière version 0.98b).
-        // master.dl.sourceforge.net contourne la page HTML de sélection de miroir.
+        // Distribué à l'origine sur SourceForge (plus maintenu, dernière version 0.98b).
+        // 2026-08-21 : cf. commentaire détaillé sur l'entrée EightyOne plus haut — même
+        // correctif (hébergement sur demobase.free.fr, SourceForge exigeant désormais
+        // JavaScript pour tout téléchargement).
         // BIOS requis : lynxboot.img dans le dossier de Handy.
         new()
         {
@@ -655,9 +681,10 @@ public static class EmulatorDownloadCatalog
             DisplayName  = "Handy",
             Systems      = "Atari Lynx",
             Strategy     = DownloadStrategy.DirectUrl,
-            Source       = "https://master.dl.sourceforge.net/project/handy/handy/Handy%200.95/Handy-0.95.zip?viasf=1",
+            Source          = "http://demobase.free.fr/emus/Handy-0.95.zip",
+            VersionOverride = "0.95",
             ExeName      = "handy.exe",
-            Note         = "v0.95 — https://sourceforge.net/projects/handy/",
+            Note         = "v0.95 — hébergé sur demobase.free.fr (SourceForge exige désormais JavaScript pour tout téléchargement).",
         },
 
         // ── gp32emu (GamePark GP32) ──────────────────────────────────────────
@@ -755,16 +782,21 @@ public static class EmulatorDownloadCatalog
         // download si c'est manuel").
 
         // ── RECOIL (affichage de formats graphiques rétro) ─────────────────
+        // 2026-08-21 : même correctif que EightyOne/Fuse/Hatari/VICE/Handy ci-dessus —
+        // SourceForge exige désormais JavaScript pour tout téléchargement (page
+        // interstitielle "Your download will start shortly..."), incompatible avec un
+        // client HTTP automatisé. Hébergé sur demobase.free.fr comme les 5 autres.
         new()
         {
             FolderName   = "RECOIL",
             DisplayName  = "RECOIL",
             Systems      = "Retro graphics viewer",
             RootFolder   = "Externals",
-            Strategy     = DownloadStrategy.DirectUrl,
-            Source       = "https://master.dl.sourceforge.net/project/recoil/recoil/6.4.5/recoil-6.4.5-win64.zip?viasf=1",
+            Strategy        = DownloadStrategy.DirectUrl,
+            Source          = "http://demobase.free.fr/emus/recoil-6.4.5-win64.zip",
+            VersionOverride = "6.4.5",
             ExeName      = "recoil2png.exe",
-            Note         = "Version 6.4.5 (win64) — convertisseur recoil2png pour les formats graphiques rétro",
+            Note         = "Version 6.4.5 (win64) — convertisseur recoil2png pour les formats graphiques rétro. Hébergé sur demobase.free.fr (SourceForge exige désormais JavaScript pour tout téléchargement).",
         },
 
         // ── UADE : retiré de ce catalogue le 2026-08-06 ─────────────────────

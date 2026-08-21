@@ -1,3 +1,4 @@
+using DemoBase.Core.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using SevenZipExtractor;
@@ -57,6 +58,43 @@ public class EmulatorInstallerService
     //      vrai Chrome, donc ne déclenche pas les heuristiques anti-bot avancées.
     private static readonly HttpClient _http = BuildHttpClient();
 
+    // 2026-08-21, retour utilisateur : les 5 entrées SourceForge (EightyOne, Fuse,
+    // Hatari, VICE, Handy) échouent avec _http quelle que soit l'URL SourceForge
+    // essayée (master.dl direct, sourceforge.net/.../download, downloads.sourceforge.net,
+    // ?use_mirror=X) — confirmé en récupérant ces pages directement : SourceForge
+    // renvoie systématiquement la page interstitielle HTML "Your download will start
+    // shortly..." (déclenchement du vrai téléchargement par JavaScript côté navigateur,
+    // pas par une redirection HTTP serveur). Capture d'écran utilisateur à l'appui : la
+    // MÊME URL fonctionne dans Firefox (avec ~5s d'attente pour le timer JS) — la
+    // différence n'est donc pas l'URL mais l'empreinte du client HTTP. Client HTTP dédié,
+    // utilisé UNIQUEMENT pour les hôtes *.sourceforge.net (ne touche pas _http, dont le
+    // réglage actuel — UA hybride, HTTP/1.1 forcé — a été spécifiquement ajusté pour
+    // D'AUTRES sites et ne doit pas régresser : un vrai User-Agent Chrome complet avait
+    // déjà, par le passé, déclenché des protections anti-bot PIRES sur d'autres sites,
+    // cf. commentaire ci-dessous sur _http). Ce client dédié imite un vrai navigateur
+    // moderne (HTTP/2 si possible, UA Chrome complet, en-têtes Accept/Accept-Language) —
+    // pari raisonnable puisque exactement cette combinaison réussit dans un vrai
+    // navigateur pour ces mêmes URLs.
+    private static readonly HttpClient _httpSourceForge = BuildSourceForgeHttpClient();
+
+    private static HttpClient BuildSourceForgeHttpClient()
+    {
+        var handler = new HttpClientHandler { AllowAutoRedirect = false };
+        var client  = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(10) };
+
+        // HTTP/2 si le serveur le supporte (négociation normale, pas forcée comme pour
+        // _http) — un vrai navigateur moderne utilise HTTP/2 avec sourceforge.net.
+        client.DefaultRequestVersion = System.Net.HttpVersion.Version20;
+        client.DefaultVersionPolicy  = HttpVersionPolicy.RequestVersionOrLower;
+
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
+        client.DefaultRequestHeaders.Accept.ParseAdd(
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8");
+        client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7");
+        return client;
+    }
+
     private static HttpClient BuildHttpClient()
     {
         // AllowAutoRedirect=true (par défaut) ne suit PAS les redirections qui
@@ -69,9 +107,13 @@ public class EmulatorInstallerService
         var handler = new HttpClientHandler { AllowAutoRedirect = false };
         var client  = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(10) };
 
-        // Force HTTP/1.1 : plusieurs CDN anciens (SourceForge en particulier) gèrent
-        // mal la négociation HTTP/2 par défaut de .NET 5+ sur leur chaîne de
-        // sélection de mirroir, et renvoient une page HTML au lieu du binaire.
+        // Force HTTP/1.1 : plusieurs CDN anciens gèrent mal la négociation HTTP/2 par
+        // défaut de .NET 5+, et renvoient une page HTML au lieu du binaire. NE PAS
+        // étendre ce réglage à SourceForge (cf. _httpSourceForge ci-dessus) : ce forçage
+        // HTTP/1.1 était originellement motivé PAR SourceForge, mais leur infrastructure
+        // a depuis changé — HTTP/1.1 semble maintenant contribuer au déclenchement de la
+        // page interstitielle plutôt qu'à l'éviter (un vrai navigateur moderne utilise
+        // HTTP/2 avec sourceforge.net).
         client.DefaultRequestVersion       = System.Net.HttpVersion.Version11;
         client.DefaultVersionPolicy        = HttpVersionPolicy.RequestVersionExact;
 
@@ -80,6 +122,14 @@ public class EmulatorInstallerService
         client.DefaultRequestHeaders.Accept.ParseAdd("*/*");
         return client;
     }
+
+    /// <summary>Vrai si l'hôte de <paramref name="url"/> appartient à la famille de
+    /// domaines SourceForge (sourceforge.net et tous ses sous-domaines CDN, ex.
+    /// *.dl.sourceforge.net, downloads.sourceforge.net) — utilisé pour router ces
+    /// requêtes vers <see cref="_httpSourceForge"/> plutôt que <see cref="_http"/>.</summary>
+    private static bool IsSourceForgeHost(string url) =>
+        Uri.TryCreate(url, UriKind.Absolute, out var uri)
+        && uri.Host.EndsWith("sourceforge.net", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// GET avec suivi manuel des redirections (jusqu'à 10 sauts), y compris les
@@ -93,7 +143,8 @@ public class EmulatorInstallerService
         var current = url;
         for (int hop = 0; hop < 10; hop++)
         {
-            var response = await _http.GetAsync(current, completionOption, ct);
+            var client   = IsSourceForgeHost(current) ? _httpSourceForge : _http;
+            var response = await client.GetAsync(current, completionOption, ct);
             if (response.StatusCode is System.Net.HttpStatusCode.Moved
                                      or System.Net.HttpStatusCode.Found
                                      or System.Net.HttpStatusCode.SeeOther
@@ -112,7 +163,8 @@ public class EmulatorInstallerService
         }
         // Dernier essai sans intercepter le résultat (laisse EnsureSuccessStatusCode
         // remonter une erreur explicite si on est toujours en boucle de redirection).
-        return await _http.GetAsync(current, completionOption, ct);
+        var lastClient = IsSourceForgeHost(current) ? _httpSourceForge : _http;
+        return await lastClient.GetAsync(current, completionOption, ct);
     }
 
     private static readonly JsonSerializerOptions _json = new() { WriteIndented = true };
@@ -613,6 +665,12 @@ public class EmulatorInstallerService
     private static async Task<string> DownloadArchiveAsync(
         string url, string folderName,
         IProgress<(string, int)>? progress, CancellationToken ct)
+        => await DownloadArchiveAsync(url, folderName, progress, ct, allowSourceForgeHtmlFallback: true);
+
+    private static async Task<string> DownloadArchiveAsync(
+        string url, string folderName,
+        IProgress<(string, int)>? progress, CancellationToken ct,
+        bool allowSourceForgeHtmlFallback)
     {
         var tmpDir  = Path.Combine(Path.GetTempPath(), "DemoBaseInstall");
         Directory.CreateDirectory(tmpDir);
@@ -620,6 +678,44 @@ public class EmulatorInstallerService
 
         using var response = await GetFollowingRedirectsAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
         response.EnsureSuccessStatusCode();
+
+        // 2026-08-21, retour utilisateur : plusieurs entrées SourceForge (EightyOne, Fuse,
+        // Hatari, VICE, Handy) renvoyaient un HTTP 200 "réussi" mais dont le corps était en
+        // fait une page HTML (interstitiel/erreur du CDN de mirroir), détecté seulement
+        // après coup par ExtractSevenZipFlat avec un message peu clair ("Aucune signature
+        // d'archive 7-Zip trouvée"). On vérifie maintenant le Content-Type dès les en-têtes
+        // reçus — si le serveur annonce explicitement du HTML/texte au lieu d'un binaire, on
+        // échoue tout de suite avec un message qui pointe directement vers la vraie cause,
+        // sans même télécharger le corps. Ce contrôle est best-effort : certains serveurs
+        // mal configurés renvoient un Content-Type générique/absent même pour du vrai HTML,
+        // auquel cas ce garde-fou ne se déclenche pas et l'erreur d'extraction habituelle
+        // (avec l'URL) prend le relais comme avant.
+        var mediaType = response.Content.Headers.ContentType?.MediaType;
+        if (mediaType is "text/html" or "text/plain" or "application/xhtml+xml")
+        {
+            // 2026-08-21 : pour SourceForge spécifiquement, la page interstitielle "Your
+            // download will start shortly..." contient — pour les clients sans JavaScript
+            // (accessibilité/SEO) — un lien de secours direct vers le vrai fichier sur le
+            // CDN de mirroir (dl.sourceforge.net) ou une balise <meta http-equiv="refresh">.
+            // Avant d'abandonner, on tente d'extraire ce lien du HTML reçu et de relancer le
+            // téléchargement dessus UNE fois (allowSourceForgeHtmlFallback évite toute boucle
+            // si jamais cette seconde URL renvoie elle aussi du HTML).
+            if (allowSourceForgeHtmlFallback && IsSourceForgeHost(url))
+            {
+                var html = await response.Content.ReadAsStringAsync(ct);
+                var extractedUrl = TryExtractSourceForgeRealDownloadUrl(html, url);
+                if (extractedUrl != null)
+                {
+                    PerfLogger.Mark($"SOURCEFORGE: page interstitielle détectée pour '{url}' — nouvelle tentative via '{extractedUrl}'");
+                    return await DownloadArchiveAsync(extractedUrl, folderName, progress, ct, allowSourceForgeHtmlFallback: false);
+                }
+            }
+
+            throw new InvalidDataException(
+                $"le serveur a répondu avec du contenu texte/HTML (Content-Type: {mediaType}) " +
+                "au lieu du fichier binaire attendu — probablement une page d'erreur ou un " +
+                "interstitiel de sélection de mirroir plutôt que le vrai téléchargement.");
+        }
 
         var total = response.Content.Headers.ContentLength ?? 0L;
         await using var stream = await response.Content.ReadAsStreamAsync(ct);
@@ -640,6 +736,34 @@ public class EmulatorInstallerService
         }
 
         return tmpFile;
+    }
+
+    /// <summary>
+    /// Cherche, dans le HTML de la page interstitielle SourceForge "Your download will
+    /// start shortly...", une URL de téléchargement direct exploitable sans JavaScript :
+    /// en priorité une balise &lt;meta http-equiv="refresh" content="N;url=..."&gt;, sinon
+    /// le premier lien pointant vers un CDN de mirroir SourceForge
+    /// (*.dl.sourceforge.net / downloads.sourceforge.net). Retourne null si rien trouvé
+    /// (page vraiment vide de fallback non-JS, ou structure de page différente de celle
+    /// observée le 2026-08-21).
+    /// </summary>
+    private static string? TryExtractSourceForgeRealDownloadUrl(string html, string pageUrl)
+    {
+        var metaRefresh = Regex.Match(html,
+            @"<meta[^>]+http-equiv\s*=\s*[""']refresh[""'][^>]*content\s*=\s*[""'][^;]*;\s*url\s*=\s*([^""']+)[""']",
+            RegexOptions.IgnoreCase);
+        if (metaRefresh.Success)
+        {
+            var refreshUrl = System.Net.WebUtility.HtmlDecode(metaRefresh.Groups[1].Value.Trim());
+            return Uri.TryCreate(refreshUrl, UriKind.Absolute, out _)
+                ? refreshUrl
+                : new Uri(new Uri(pageUrl), refreshUrl).ToString();
+        }
+
+        var mirrorLink = Regex.Match(html,
+            @"https?://[a-z0-9.-]*(?:dl\.sourceforge\.net|downloads\.sourceforge\.net)/[^""'\s<>]+",
+            RegexOptions.IgnoreCase);
+        return mirrorLink.Success ? System.Net.WebUtility.HtmlDecode(mirrorLink.Value) : null;
     }
 
     // ── Extraction plate ──────────────────────────────────────────────────────
