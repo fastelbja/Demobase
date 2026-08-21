@@ -27,11 +27,18 @@ public partial class PlaylistItemViewModel : ObservableObject
         _tracks.CollectionChanged += (_, _) => OnPropertyChanged(nameof(TrackCount));
     }
 
+    // 2026-08-19 : le générateur CommunityToolkit.Mvvm déclare le paramètre "oldValue"
+    // des méthodes partielles On<Prop>Changing/On<Prop>Changed comme nullable (T?),
+    // même quand le champ source ([ObservableProperty] private ObservableCollection<...>
+    // _tracks = [];) est lui-même non-nullable — la valeur initiale du champ (avant tout
+    // affectation) n'est pas garantie par le générateur. Sans ce "?" ici, la signature ne
+    // correspond pas à la déclaration générée → CS8611. Null-check ajouté en conséquence.
     partial void OnTracksChanged(
-        ObservableCollection<FavoriteSoundtrack> oldValue,
+        ObservableCollection<FavoriteSoundtrack>? oldValue,
         ObservableCollection<FavoriteSoundtrack> newValue)
     {
-        oldValue.CollectionChanged -= OnTracksCollectionChanged;
+        if (oldValue != null)
+            oldValue.CollectionChanged -= OnTracksCollectionChanged;
         newValue.CollectionChanged += OnTracksCollectionChanged;
         OnPropertyChanged(nameof(TrackCount));
     }

@@ -1736,7 +1736,7 @@ public partial class ReleaseDetailViewModel : ObservableObject, IDisposable
         // ensuite pour cette release.
         if (NeedsEmulatorProfile && !_fileSelectionConfirmed)
         {
-            var launchableForPicker = Detail.DatFiles.Where(d => !d.IsCodeSourceEntry).ToList();
+            var launchableForPicker = Detail!.DatFiles.Where(d => !d.IsCodeSourceEntry).ToList();
             if (launchableForPicker.Count > 1)
             {
                 var chosen = await PromptFileChoiceAsync(launchableForPicker);
@@ -1757,7 +1757,7 @@ public partial class ReleaseDetailViewModel : ObservableObject, IDisposable
         // via PlatformPickerWindow et mémorise la réponse — cf. RESUME_PROJET.md
         // (2026-07-25, retour utilisateur : releases multi-plateforme ET multi-fichier,
         // ex. Amiga AGA + Atari Falcon, un seul override par release ne suffisait pas).
-        int? emulatorConfigId = Detail.DefaultEmulatorConfig?.Id;
+        int? emulatorConfigId = Detail!.DefaultEmulatorConfig?.Id;
         if (NeedsEmulatorProfile)
         {
             emulatorConfigId = await ResolveOrPromptEmulatorConfigIdAsync();
